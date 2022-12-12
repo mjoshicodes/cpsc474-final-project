@@ -1,6 +1,12 @@
 # cpsc474-final-project
 CPSC 474 Final Project
 
+Useful Resources:
+https://github.com/ian-s-mcb/chopsticks-hand-game-js
+
+https://theboardgamescholar.com/2021/01/10/a-chopsticks-solution-part-1/
+
+
 Rules:
 This official set of rules is called rollover where five fingers are subtracted should a hand's sum exceeds 5 as described below.
 
