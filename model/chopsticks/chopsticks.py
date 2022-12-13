@@ -6,8 +6,8 @@ from hand import Hands
 
 class Game:
     def __init__(self):
-        self.p1 = Hands(5, 5)
-        self.p2 = Hands(5, 5)
+        self.p1 = Hands(1, 1) 
+        self.p2 = Hands(1, 1)
 
     def attack(self, attacked_player, attacked_hand, attacker_hand): # index 0 = p1 and 1 = p2 
         attacked = self.p1 if attacked_player == 0 else self.p2
