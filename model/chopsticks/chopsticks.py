@@ -35,9 +35,29 @@ class Game:
     def play():
         pass
 
-    def evaluate_policies():
+    def evaluate_policies(game, p0_policy, p1_policy, count):
+        p0_total = 0
+        p1_total = 0
+        scores = dict()
+        total_hands = 0
+        for g in range(count):
+            if g % 2 == 0:
+                results = game.play(p0_policy, p1_policy)
+                p0_pts = results[0]
+            else:
+                results = game.play(p1_policy, p0_policy)
+                p0_pts = -results[0]
+            if p0_pts not in scores:
+                scores[p0_pts] = 0
+            scores[p0_pts] += 1
+            if p0_pts > 0:
+                p0_total += p0_pts
+            else:
+                p1_total += -p0_pts
+        total_hands += results[1]
+        return (p0_total - p1_total) / count, p0_total/count, scores, total_hands/ count
+        
         # evaluate based on if won and how many turns it took to win/lose
-        pass
 
 
     # def game_value(self, p0_score, p1_score):

@@ -1,8 +1,9 @@
 import sys
 
 from policy import CompositePolicy, RandomThrower, RandomPegger, GreedyThrower, GreedyPegger
-from cribbage import Game, evaluate_policies
+from chopsticks import Game, evaluate_policies
 from my_policy import MyPolicy
+
 
 if __name__ == "__main__":
     games = 2

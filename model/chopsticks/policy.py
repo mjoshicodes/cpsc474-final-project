@@ -10,7 +10,7 @@ class ChopsticksPolicy(ABC):
 
         
     @abstractmethod
-    def keep(self, hand, scores, am_current_player):
+    def split(self, hand, scores, am_current_player):
         """ Returns a pair (keep, throw) determining which cards from the given
             hand to keep under this policy.
 
@@ -22,7 +22,7 @@ class ChopsticksPolicy(ABC):
 
     
     @abstractmethod
-    def peg(self, cards, history, scores, am_current_player):
+    def attack(self, cards, history, scores, am_current_player):
         """ Returns the card to play from the given list.
 
             cards -- a list of cards
@@ -34,6 +34,16 @@ class ChopsticksPolicy(ABC):
         pass
 
 
+    def divide(self, cards, history, scores, am_current_player):
+        """ Returns the card to play from the given list.
+
+            cards -- a list of cards
+            history -- the pegging history up to the point to decide what to play
+            scores -- the current scores, with this policy's score first
+            am_current_player -- a boolean flag indicating whether you are the current player
+
+        """
+        pass
 class SplitPolicy(ABC):
     """ An abstract base class for cribbage keep/throw policies. """
     def __init__(self, game):
@@ -45,7 +55,7 @@ class SplitPolicy(ABC):
 
         
     @abstractmethod
-    def keep(self, hand, scores, am_current_player):
+    def split(self, hand, scores, am_current_player):
         """ Returns a pair (keep, throw) determining which cards from the given
             hand to keep under this policy.
 
@@ -81,7 +91,7 @@ class AttackPolicy(ABC):
         pass
     
 
-class DivisionPolicy(ABC):
+class DividePolicy(ABC):
     """ An abstract base class for cribbage keep/throw policies. """
     def __init__(self, game):
         """ Creates a policy to play the given game.
@@ -107,7 +117,7 @@ class CompositePolicy(ChopsticksPolicy):
         policy.
     """
     
-    def __init__(self, game, thrower, pegger):
+    def __init__(self, game, splitter, attacker, divider):
         """ Creates a policy to play the given game using the given keep/throw
             and pegging policies.
 
@@ -116,11 +126,12 @@ class CompositePolicy(ChopsticksPolicy):
             pegger -- a PegPolicy
         """
         super().__init__(game)
-        self._thrower = thrower
-        self._pegger = pegger
+        self._splitter = splitter
+        self._attacker = attacker
+        self._divider = divider
 
 
-    def keep(self, hand, scores, am_current_player):
+    def split(self, hand, scores, am_current_player):
         """ Returns the (keep, throw) pair selected by this policy's
             keep/throw policy.
 
@@ -132,7 +143,7 @@ class CompositePolicy(ChopsticksPolicy):
         return self._thrower.keep(hand, scores, am_current_player)
 
 
-    def peg(self, cards, history, scores, am_current_player):
+    def attack(self, cards, history, scores, am_current_player):
         """ Returns the card to play selected by this policy's pegging policy.
 
             cards -- a list of cards
@@ -141,9 +152,18 @@ class CompositePolicy(ChopsticksPolicy):
             am_current_player -- a boolean flag indicating whether you are the current player
 
         """
-        return self._pegger.peg(cards, history, scores, am_current_player)
-    
-    
+        return self._pegger.peg(cards, history, scores, am_current_player) 
+
+    def divide(self, cards, history, scores, am_current_player):
+        """ Returns the card to play selected by this policy's pegging policy.
+
+            cards -- a list of cards
+            history -- the pegging history up to the point to decide what to play
+            scores -- the current scores, with this policy's score first
+            am_current_player -- a boolean flag indicating whether you are the current player
+
+        """
+        return self._pegger.peg(cards, history, scores, am_current_player) 
 
 class RandomSplitter(SplitPolicy):
     """ A cribbage policy for pegging that chooses a card to play uniformly
@@ -201,7 +221,7 @@ class RandomAttacker(AttackPolicy):
         return keep[0:4], keep[4:]
 
 
-class RandomDivider(DivisionPolicy):
+class RandomDivider(DividePolicy):
     """ A cribbage policy for pegging that chooses a card to play uniformly
         randomly.
     """
@@ -231,7 +251,7 @@ class RandomDivider(DivisionPolicy):
         return None
 
 
-class GreedyAttacker(AttackPolicy):
+class GreedyAttacker(SplitPolicy):
     """ A greedy policy for keep/throw in cribbage.  The greedy decision is
         based only on the score obtained by the cards kept and thrown, without
         consideration for how they might interact with the turned card or
@@ -246,7 +266,7 @@ class GreedyAttacker(AttackPolicy):
         super().__init__(game)
 
 
-    def keep(self, hand, scores, am_current_player):
+    def split(self, hand, scores, am_current_player):
         """ Selects the cards to keep to maximize the net score for those cards
             and the cards in the crib.  Points in the crib count toward the
             total if this policy is the dealer and against the total otherwise.
@@ -260,7 +280,7 @@ class GreedyAttacker(AttackPolicy):
         return keep, throw
     
     
-class GreedyPegger(PegPolicy):
+class GreedyAttacker(AttackPolicy):
     """ A cribbage pegging policy that plays the card that maximizes the
         points earned on the current play.
     """
@@ -273,7 +293,44 @@ class GreedyPegger(PegPolicy):
         super().__init__(game)
 
 
-    def peg(self, cards, history, scores, am_dealer):
+    def attack(self, cards, history, scores, am_dealer):
+        """ Returns the card that maximizes the points earned on the next
+            play.  Ties are broken uniformly randomly.
+
+            cards -- a list of cards
+            history -- the pegging history up to the point to decide what to play
+            scores -- the current scores, with this policy's score first
+            am_dealer -- a boolean flag indicating whether the crib
+                         belongs to this policy
+        """
+        # shuffle cards to effectively break ties randomly
+        random.shuffle(cards)
+
+        best_card = None
+        best_score = None
+        for card in cards:
+            score = history.score(self._game, card, 0 if am_dealer else 1)
+            if score is not None and (best_score is None or score > best_score):
+                best_score = score
+                best_card = card
+        return best_card
+
+
+
+class GreedyDivider(DividePolicy):
+    """ A cribbage pegging policy that plays the card that maximizes the
+        points earned on the current play.
+    """
+
+    def __init__(self, game):
+        """ Creates a greedy pegging policy for the given game.
+
+            game -- a cribbage Game
+        """
+        super().__init__(game)
+
+
+    def attack(self, cards, history, scores, am_dealer):
         """ Returns the card that maximizes the points earned on the next
             play.  Ties are broken uniformly randomly.
 
