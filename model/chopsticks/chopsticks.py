@@ -1,37 +1,48 @@
 import itertools as it
 import sys
 
-# import scoring
+from enum import Enum
 from hand import Hands
+
+class Player(Enum):
+    P1 = 0
+    P2 = 1
+
+class Hand(Enum):
+    Left = 0
+    Right = 1
 
 class Game:
     def __init__(self):
-        self.p1 = Hands(1, 1) 
+        self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
 
-    def attack(self, attacked_player, attacked_hand, attacker_hand): # index 0 = p1 and 1 = p2 
-        attacked = self.p1 if attacked_player == 0 else self.p2
-        attacker = self.p1 if attacked_player == 1 else self.p2
-        if attacked_hand == 0: # left hand = 0 right hand = 1
-            attack_value = attacker.left_hand() if attacker_hand == 0 else attacker.right_hand()
+    def attack(self, attacked_player, attacked_hand, attacker_hand):
+        attacked = self.p1 if attacked_player == Player.P1 else self.p2
+        attacker = self.p1 if attacked_player == Player.P2 else self.p2
+
+        attack_value = attacker.left_hand() if attacker_hand == Hand.Left else attacker.right_hand()
+
+        if attacked_hand == Hand.Left:
+            attacked.attack_left(attack_value)
+        else:
             attacked.attack_right(attack_value)
-    
+
     def transfer(self, player_idx, tranfer_hand, transfer_value):
         player = self.p1 if player_idx == 1 else self.p2
-        if tranfer_hand == 0: # Tranfer from left to right
+        if tranfer_hand == Hand.Left:
             player.transfer_left_to_right(transfer_value)
         else:
             player.transfer_right_to_left(transfer_value)
-    
+
     def game_over(self):
-        """ Returns winner if game over else returns None"""
         if self.p1.lost():
             return self.p2
         elif self.p2.lost():
             return self.p1
         else:
             return None
-    
+
     def play():
         pass
 
@@ -56,7 +67,7 @@ class Game:
                 p1_total += -p0_pts
         total_hands += results[1]
         return (p0_total - p1_total) / count, p0_total/count, scores, total_hands/ count
-        
+
         # evaluate based on if won and how many turns it took to win/lose
 
 
@@ -86,7 +97,7 @@ class Game:
 
     #         return points * (1 if p0_score > p1_score else -1)
 
-    
+
 
 #     def play(self, p0_policy, p1_policy, log):
 #         scores = [0, 0]
@@ -113,7 +124,7 @@ class Game:
 #             for p in [0, 1]:
 #                 if not self.is_legal_split(hands[p], keeps[p]):
 #                     raise Exception("split does not partition hand")
-                
+
 #             scores[dealer] += self.turn_card_value(turn)
 #             log("Turn: " + str(turn) + " " + str(scores))
 
@@ -133,7 +144,7 @@ class Game:
 #                         raise Exception("passing when has legal play")
 #                     elif play is not None and not history.is_legal(self, play, 0 if peg_turn == dealer else 1):
 #                         raise Exception("invalid card")
-                    
+
 #                     if play is None:
 #                         passes[peg_turn] = True
 #                     else:
@@ -155,12 +166,12 @@ class Game:
 #                     new_cards = [card for card in peg_cards[peg_turn] if card != play]
 #                     if len(new_cards) == len(peg_cards[peg_turn]):
 #                         raise Exception("played card not in hand")
-                    
+
 #                     peg_cards[peg_turn] = new_cards
-                    
+
 #                 # next player's turn
 #                 peg_turn = 1 - peg_turn
-                
+
 #                 if sum(1 if passed else 0 for passed in passes) == 2:
 #                     # both players passed; reset for next round of pegging
 #                     passes = [False, False]
@@ -188,9 +199,9 @@ class Game:
 #                 log("CRIB: " + str(crib) + str(hand_score))
 #                 scores[dealer] += hand_score[0]
 #                 log(scores)
-            
+
 #             dealer = 1 - dealer
-            
+
 #         return self.game_value(*scores), handsPlayed
 
 
@@ -222,7 +233,7 @@ class Game:
 #             p0_total += p0_pts
 #         else:
 #             p1_total += -p0_pts
-            
+
 #         total_hands += results[1]
 
 #     return (p0_total - p1_total) / count, p0_total / count, p1_total / count, scores, total_hands / count
