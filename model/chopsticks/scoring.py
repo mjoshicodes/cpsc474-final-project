@@ -1,60 +1,44 @@
-import itertools as it
+from itertools import combinations, product
 import random
+import chopsticks
 
-def greedy_throw(game, deal, crib):
-    """ Returns a greedy choice of which cards to throw.  The greedy choice
-        is determined by the score of the four cards kept and the two cards
-        thrown in isolation, without considering what the turned card
-        might be or what the opponent might throw to the crib.  If multiple
-        choices result in the same net score, then one is chosen randomly.
+def greedy_split(game, myself, opponent):
+    my_hand_sum = myself.left_hand() + myself.right_hand()
+    possible_hand_values = range(0, my_hand_sum+1)
+    split_combinations = [combo for combo in combinations(possible_hand_values, 2) if sum(combo) == my_hand_sum]
 
-        game -- a Cribbage game
-        deal -- a list of the cards dealt
-        crib -- 1 for owning the crib, -1 for opponent owning the crib
-    """
-    def score_split(indices):
-        keep = []
-        throw = []
-        for i in range(len(deal)):
-            if i in indices:
-                throw.append(deal[i])
-            else:
-                keep.append(deal[i])
-        return keep, throw, score(game, keep, None, False)[0] + crib * score(game, throw, None, True)[0]
+def greedy_attack(myself, opponent):
+    possible_attacks = [myself.left_hand(), myself.right_hand()]
+    hands_available_for_attack = [1 if opponent.left_hand() != 0 else None, 2 if opponent.right_hand() != 0 else None]
+    attack_combinations = list(product(possible_attacks, hands_available_for_attack))
 
-    throw_indices = game.throw_indices()
-    
-    # to randomize the order in which throws are considered to have the effect
-    # of breaking ties randomly
-    random.shuffle(throw_indices)
+    def score(attack):
+        attack_value, attacked_hand_idx = attack
+        attacked_hand = None
 
-    # pick the (keep, throw, score) triple with the highest score
-    return max(map(lambda i: score_split(i), throw_indices), key=lambda t: t[2])
-        
-
-def score(game, player1_hands, player2_hands, am_current_player):
-    """ Returns the score for the given hand and turn card.  The score
-        is returned as a six-element list with the total score in the
-        first element and the pairs, 15s, runs, flushes, and nobs subscores
-        in the remaining elements in that order.
-
-        game -- a cribbage game 
-        player1_hands -- a tuple for player 1's hand
-        player2_hands -- a card, or None
-        crib -- true to score by crib scoring rules
-    """
-    if am_current_player == 0:
-        if player2_hands == (0, 0):
-            reward = 1
-        elif player1_hands == (0, 0):
-            reward = -1
+        if attacked_hand_idx == chopsticks.Left:
+            attacked_hand = opponent.left_hand()
         else:
-            reward = 0
-    elif am_current_player == 1:
-        if player1_hands == (0, 0):
-            reward = 1
-        elif player2_hands == (0, 0):
-            reward = -1
+            attacked_hand = opponent.right_hand()
+
+        resulting_hand_value = (attack_value + attacked_hand) % 5
+        if resulting_hand_value == 5:
+            return attack_value, attacked_hand_idx, 1
+        elif (5 - resulting_hand_value) == myself.left_hand() or (5 - resulting_hand_value) == myself.right_hand():
+            return attack_value, attacked_hand_idx, -1
         else:
-            reward = 0
-    return reward
+            return attack_value, attacked_hand_idx, 0
+
+    return max(map(lambda attack: score(attack), attack_combinations), key=lambda t: t[2])
+
+def greedy_divison(myself, opponent):
+    pass
+
+def does_attack_kill_hand(attack_value, opponent):
+    if opponent.left_hand() != 0:
+        if attack_value + opponent.left_hand == 5:
+            return True
+
+    if opponent.right_hand() != 0:
+        if attack_value + opponent.right_hand == 5:
+            return True
