@@ -16,32 +16,36 @@ class Hands:
         return self._right_hand
 
     def transfer_right_to_left(self, transfer_sum):
-        if self._left_hand + transfer_sum <= 4:
-            self._left_hand += transfer_sum
-            self._right_hand -= transfer_sum
-        else:
-            return "not legal"
+        if self._left_deaths == 3 or self._left_hand + transfer_sum > 4:
+            return "Not a legal move!"
+        self._left_hand += transfer_sum
+        self._right_hand -= transfer_sum
 
     def transfer_left_to_right(self, transfer_sum):
-        if self._right_hand + transfer_sum <= 4:
-            self._right_hand += transfer_sum
-            self._left_hand -= transfer_sum
-        else:
-            return "not legal"
+        if self._right_deaths == 3 or self._right_hand + transfer_sum > 4:
+            return "Not a legal move!"
+        self._right_hand += transfer_sum
+        self._left_hand -= transfer_sum
 
     def attack_left(self, attack_sum):
+        if self._left_deaths == 3:
+            return False
         new_sum = (self._left_hand + attack_sum) % 5
         if new_sum == 0:
             self._left_deaths += 1
-            print("left hand dead")
+            print("Left Hand Dead")
         self._left_hand = new_sum
+        return True
 
     def attack_right(self, attack_sum):
+        if self._right_deaths == 3:
+            return False
         new_sum = (self._right_hand + attack_sum) % 5
         if new_sum == 0:
             self._right_deaths += 1
-            print("right hand dead")
+            print("Right Hand Dead")
         self._right_hand = new_sum
+        return True
 
     def left_dead(self):
         return self._left_hand == 0
