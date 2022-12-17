@@ -15,9 +15,20 @@ class Hand(Enum):
     Right = 2
 
 class Game:
+
     def __init__(self):
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
+        self.turn = Player.P1
+
+    def next(self):
+        """
+            Updates the turn to the next player.
+        """
+        if self.turn == Player.P1:
+            self.turn = Player.P2
+        else:
+            self.turn = Player.P1
 
     def attack(self, attacked_player_idx, attacked_hand, attacker_hand=None, attack_value=None):
         # print("attacked player: ", attacked_player_idx)
@@ -35,6 +46,19 @@ class Game:
         else:
             attacked.attack_right(attack_value)
 
+    def get_actions(self):
+        actions, p1_hands, p2_hands = [], [], []
+        if not self.p1.left_deaths() == 3:
+            p1_hands.append(self.p1.left_hand())
+        if not self.p1.right_deaths() == 3:
+            p1_hands.append(self.p1.right_hand())
+        if not self.p2.left_deaths() == 3:
+            p2_hands.append(self.p2.left_hand())
+        if not self.p2.right_deaths() == 3:
+            p2_hands.append(self.p2.right_hand())
+        
+        
+
     def transfer(self, player_idx, tranfer_hand, transfer_value):
         player = self.p1 if player_idx == 1 else self.p2
         if tranfer_hand == Hand.Left:
@@ -43,9 +67,11 @@ class Game:
             player.transfer_right_to_left(transfer_value)
 
     def is_game_over(self):
-        if self.p1.lost():
-            return True
-        elif self.p2.lost():
+        '''
+            Checks to see if any of the players have lost.
+            Returns boolean that indicates result after check.
+        '''
+        if self.p1.lost() or self.p2.lost():
             return True
         else:
             return False
@@ -54,18 +80,17 @@ class Game:
         scores = [0, 0]
         p1 = 0
         p2 = 1
-        turn = 0
 
         while not self.is_game_over():
-            if turn % 2 == 0:
+            if self.turn == Player.P1:
                 attack_value, attacked_hand_idx, reward = scoring.greedy_attack(self.p1, self.p2)
-                self.attack(2, attacked_hand_idx, attack_value=attack_value)
+                self.attack(Player.P2, attacked_hand_idx, attack_value=attack_value)
                 scores[p1] += reward
             else:
                 attack_value, attacked_hand_idx, reward = scoring.greedy_attack(self.p2, self.p1)
-                self.attack(1, attacked_hand_idx, attack_value=attack_value)
+                self.attack(Player.P1, attacked_hand_idx, attack_value=attack_value)
                 scores[p2] += reward
-
+            self.next()
         print(scores)
         return scores
 
@@ -81,7 +106,7 @@ def evaluate_policies(game, p1_policy, p2_policy, count):
             p1_pts = results[0]
         else:
             results = game.play()
-            results = game.play(p0_policy, p1_policy, lambda mess: None)
+            results = game.play(p1_policy, p2_policy, lambda mess: None)
             p1_pts = -results[0]
         if p1_pts not in scores:
             scores[p1_pts] = 0
