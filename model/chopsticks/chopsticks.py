@@ -6,11 +6,13 @@ from hand import Hands
 
 import scoring
 
-P1 = 1
-P2 = 2
+class Player(Enum):
+    P1 = 1
+    P2 = 2
 
-Left = 1
-Right = 2
+class Hand(Enum):
+    Left = 1
+    Right = 2
 
 class Game:
     def __init__(self):
@@ -22,20 +24,20 @@ class Game:
         # print("attacked hand: ", attacked_hand)
         # print("attack_value: ", attack_value)
 
-        attacked = self.p1 if attacked_player_idx == P1 else self.p2
-        attacker = self.p1 if attacked_player_idx == P2 else self.p2
+        attacked = self.p1 if attacked_player_idx == Player.P1 else self.p2
+        attacker = self.p1 if attacked_player_idx == Player.P2 else self.p2
 
         if attacker_hand is not None:
-            attack_value = attacker.left_hand() if attacker_hand == Left else attacker.right_hand()
+            attack_value = attacker.left_hand() if attacker_hand == Hand.Left else attacker.right_hand()
 
-        if attacked_hand == Left:
+        if attacked_hand == Hand.Left:
             attacked.attack_left(attack_value)
         else:
             attacked.attack_right(attack_value)
 
     def transfer(self, player_idx, tranfer_hand, transfer_value):
         player = self.p1 if player_idx == 1 else self.p2
-        if tranfer_hand == Left:
+        if tranfer_hand == Hand.Left:
             player.transfer_left_to_right(transfer_value)
         else:
             player.transfer_right_to_left(transfer_value)
