@@ -16,8 +16,9 @@ def greedy_attack(myself: Hands, opponent: Hands):
     def score(attack):
         attack_value, attacked_hand_idx = attack
         attacked_hand = opponent.left_hand() if attacked_hand_idx == Hand.Left else opponent.right_hand()
-        resulting_hand_value = (attack_value + attacked_hand) % 5
-        if resulting_hand_value == 5:
+        resulting_attack_value = (attack_value + attacked_hand) % 5
+
+        if resulting_attack_value == 0:
             return attack_value, attacked_hand_idx, 1
         elif (5 - resulting_attack_value) == myself.left_hand() or (5 - resulting_attack_value) == myself.right_hand():
             return attack_value, attacked_hand_idx, -1

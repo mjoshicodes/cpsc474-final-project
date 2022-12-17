@@ -69,7 +69,7 @@ class Game:
         print(scores)
         return scores
 
-def evaluate_policies(game, count):
+def evaluate_policies(game, p1_policy, p2_policy, count):
     p1_total = 0
     p2_total = 0
     scores = dict()
@@ -77,7 +77,7 @@ def evaluate_policies(game, count):
     for g in range(count):
         if g % 2 == 0:
             # results = game.play()
-            results = game.play(p0_policy, p1_policy, lambda mess: None)
+            results = game.play(p1_policy, p2_policy, lambda mess: None)
             p1_pts = results[0]
         else:
             results = game.play()
