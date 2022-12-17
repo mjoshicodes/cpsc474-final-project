@@ -1,8 +1,7 @@
 import sys
 
-from policy import CompositePolicy
-from chopsticks import Game
-
+from policy import CompositePolicy, RandomSplitter, RandomAttacker, RandomDivider, GreedyAttacker
+from chopsticks import Game, evaluate_policies
 
 if __name__ == "__main__":
     games = 2
@@ -10,11 +9,10 @@ if __name__ == "__main__":
         games = int(sys.argv[1])
 
     game = Game()
-    game.play()
-    # benchmark = CompositePolicy(game, GreedyThrower(game), GreedyPegger(game))
-    # submission = MyPolicy(game)
+    benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
+    submission = CompositePolicy(game, RandomSplitter(game), GreedyAttacker(game), RandomDivider(game))
 
-    # results = evaluate_policies(game, submission, benchmark, games)
-    # print("NET:", results[0])
-    # print(results)
+    results = evaluate_policies(game, submission, benchmark, games)
+    print("NET:", results[0])
+    print(results)
 

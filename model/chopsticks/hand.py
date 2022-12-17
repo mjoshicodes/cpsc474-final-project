@@ -33,14 +33,12 @@ class Hands:
         new_sum = (self._left_hand + attack_sum) % 5
         if new_sum == 0:
             self._left_deaths += 1
-            print("left hand dead")
         self._left_hand = new_sum
 
     def attack_right(self, attack_sum):
         new_sum = (self._right_hand + attack_sum) % 5
         if new_sum == 0:
             self._right_deaths += 1
-            print("right hand dead")
         self._right_hand = new_sum
 
     def left_dead(self):

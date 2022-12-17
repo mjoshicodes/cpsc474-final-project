@@ -18,9 +18,9 @@ class Game:
         self.p2 = Hands(1, 1)
 
     def attack(self, attacked_player_idx, attacked_hand, attacker_hand=None, attack_value=None):
-        print("attacked player: ", attacked_player_idx)
-        print("attacked hand: ", attacked_hand)
-        print("attack_value: ", attack_value)
+        # print("attacked player: ", attacked_player_idx)
+        # print("attacked hand: ", attacked_hand)
+        # print("attack_value: ", attack_value)
 
         attacked = self.p1 if attacked_player_idx == P1 else self.p2
         attacker = self.p1 if attacked_player_idx == P2 else self.p2
@@ -40,45 +40,53 @@ class Game:
         else:
             player.transfer_right_to_left(transfer_value)
 
-    def game_over(self):
+    def is_game_over(self):
         if self.p1.lost():
-            return self.p2
+            return True
         elif self.p2.lost():
-            return self.p1
+            return True
         else:
-            return None
+            return False
 
     def play(self):
-        for i in range(10):
-            if i % 2 == 0:
+        scores = [0, 0]
+        p1 = 0
+        p2 = 1
+        turn = 0
+
+        while not self.is_game_over():
+            if turn % 2 == 0:
                 attack_value, attacked_hand_idx, reward = scoring.greedy_attack(self.p1, self.p2)
                 self.attack(2, attacked_hand_idx, attack_value=attack_value)
+                scores[p1] += reward
             else:
                 attack_value, attacked_hand_idx, reward = scoring.greedy_attack(self.p2, self.p1)
                 self.attack(1, attacked_hand_idx, attack_value=attack_value)
+                scores[p2] += reward
 
-            print(self.p1.left_hand(), self.p1.right_hand())
-            print(self.p2.left_hand(), self.p2.right_hand())
+        print(scores)
+        return scores
 
-
-    def evaluate_policies(game, p1_policy, p2_policy, count):
-        p1_total = 0
-        p2_total = 0
-        scores = dict()
-        total_hands = 0
-        for g in range(count):
-            if g % 2 == 0:
-                results = game.play(p1_policy, p2_policy)
-                p1_pts = results[0]
-            else:
-                results = game.play(p2_policy, p1_policy)
-                p1_pts = -results[0]
-            if p1_pts not in scores:
-                scores[p1_pts] = 0
-            scores[p1_pts] += 1
-            if p1_pts > 0:
-                p0_total += p1_pts
-            else:
-                p1_total += -p1_pts
-        total_hands += results[1]
-        return (p1_total - p2_total) / count, p1_total / count, scores, total_hands / count
+def evaluate_policies(game, count):
+    p1_total = 0
+    p2_total = 0
+    scores = dict()
+    total_hands = 0
+    for g in range(count):
+        if g % 2 == 0:
+            # results = game.play()
+            results = game.play(p0_policy, p1_policy, lambda mess: None)
+            p1_pts = results[0]
+        else:
+            results = game.play()
+            results = game.play(p0_policy, p1_policy, lambda mess: None)
+            p1_pts = -results[0]
+        if p1_pts not in scores:
+            scores[p1_pts] = 0
+        scores[p1_pts] += 1
+        if p1_pts > 0:
+            p0_total += p1_pts
+        else:
+            p1_total += -p1_pts
+    total_hands += results[1]
+    return (p1_total - p2_total) / count, p1_total / count, scores, total_hands / count
