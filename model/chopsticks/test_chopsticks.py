@@ -12,7 +12,7 @@ if __name__ == "__main__":
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = CompositePolicy(game, RandomSplitter(game), GreedyAttacker(game), RandomDivider(game))
 
-    results = evaluate_policies(game, submission, benchmark, games)
+    results = evaluate_policies(game, benchmark, submission, games)
     print("NET:", results[0])
     print(results)
 

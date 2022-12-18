@@ -120,8 +120,8 @@ class GreedyAttacker(AttackPolicy):
         super().__init__(game)
 
 
-    def attack(self):
-        attack_value, attacked_hand_idx, reward = scoring.greedy_attack(self._game.p1, self._game.p2)
+    def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        attack_value, attacked_hand_idx, reward = scoring.greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
         return attack_value, attacked_hand_idx
 
 class GreedyDivider(DividePolicy):
