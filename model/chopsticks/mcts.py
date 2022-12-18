@@ -2,6 +2,12 @@ from time import time
 from random import choice
 from math import log
 
+class Position:
+
+    def __init__(self, p1_hands, p2_hands, actor) -> None:
+        self._p1_hands = p1_hands
+        self._p2_hands = p2_hands
+
 def mcts_policy(time):
     tree = {}
     def mcts_function(position):

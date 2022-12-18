@@ -73,29 +73,19 @@ class Game:
                     new_left_hand, new_right_hand = p1_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                     self.split(P1, new_left_hand, new_right_hand)
             else:
-                random_action = random.randint(0, 1)
-                if random_action == 0:
-                    left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    attack_value, attacked_hand_idx = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-                    self.attack(P1, attacked_hand_idx, attack_value=attack_value)
-                else:
-                    left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    new_left_hand, new_right_hand = p2_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-                    self.split(P1, new_left_hand, new_right_hand)
+                left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
+                opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
+                attack_value, attacked_hand_idx = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                self.attack(P1, attacked_hand_idx, attack_value=attack_value)
+
             turn += 1
 
         if self.p1.lost():
-            print("P2 Won")
             self.reset_game()
             return (0, 1)
         else:
-            print("P1 Won")
             self.reset_game()
             return (1, 0)
-
-        # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
 
 def evaluate_policies(game, p1_policy, p2_policy, count):
     p1_total = 0
