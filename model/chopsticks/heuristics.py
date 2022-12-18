@@ -9,8 +9,9 @@ class MyPolicy(ChopsticksPolicy):
     def __init__(self, game):
         super().__init__(game)
         # Change one to the GreedyThrower and change one for GreedyPegger and make your c
-        self._policy = CompositePolicy(game, MySplitter(game), MyAttacker(game), MyDivider(game))
-        
+        self._policy = CompositePolicy(game, MySplitter(
+            game), MyAttacker(game), MyDivider(game))
+
     def split(self, hand, scores, am_dealer):
         return self._policy.split()
 
@@ -22,12 +23,12 @@ class MyPolicy(ChopsticksPolicy):
     def divide(self):
         return self._policy.divide()
 
-class MySplitter(SplitPolicy):    
+
+class MySplitter(SplitPolicy):
     def __init__(self, game):
         super().__init__(game)
-    
-    def split(self):
 
+    def split(self):
 
         if self._game.turn == 1:
             left_hand_value, right_hand_value = self.game.p1.left_hand(), self.game.p1.right_hand()
@@ -35,16 +36,10 @@ class MySplitter(SplitPolicy):
         elif self._game.turn == 2:
             left_hand_value, right_hand_value = self.game.p2.left_hand(), self.game.p2.right_hand()
 
-
-
-
-
-
-
     # def split(self, hand, scores, am_dealer):
     #     def find_keep_subsets(hand):
     #         return list(itertools.combinations(hand, 4))
-        
+
     #     def score_split(indices, deal, potential_community, crib):
     #         keep = []
     #         throw = []
@@ -65,7 +60,7 @@ class MySplitter(SplitPolicy):
     #     potential_community_deck.remove(hand)
     #     potential_community = potential_community_deck._cards
     #     # random.shuffle(potential_community)
-            
+
     #     # to randomize the order in which throws are considered to have the effect
     #     # of breaking ties randomly
     #     random.shuffle(throw_indices)
@@ -74,11 +69,10 @@ class MySplitter(SplitPolicy):
     #     return keep, throw
 
 
-
 class MyAttacker(AttackPolicy):
     def __init__(self, game):
         super().__init__(game)
-    
+
     def attack(self, cards, history, scores, am_dealer):
         # Heuristics on pegging - look at history
         # Go look at good heuristics for pegging
@@ -102,18 +96,18 @@ class MyAttacker(AttackPolicy):
                         score += 1
                     elif self._game.rank_value(card.rank()) > 5:
                         score += 0.5
-                
+
                 # If the total score is below 15, prioritize playing cards that go above 15
                 elif history.total_points() < 15:
                     if self._game.rank_value(card.rank()) + history.total_points() > 15:
                         score += 0.5
                     if self._game.rank_value(card.rank()) + history.total_points() == 15:
                         score += 1
-                elif  history.total_points() >= 21:
+                elif history.total_points() >= 21:
                     if self._game.rank_value(card.rank()) > 2:
-                        score += 0.5 
+                        score += 0.5
                     if self._game.rank_value(card.rank()) + history.total_points() > 29:
-                        score += 1                  
+                        score += 1
                 if score is not None and (best_score is None or score > best_score):
                     best_score = score
                     best_card = card
@@ -123,7 +117,7 @@ class MyAttacker(AttackPolicy):
 class MyDivider(DividePolicy):
     def __init__(self, game):
         super().__init__(game)
-    
+
     def divide(self, cards, history, scores, am_dealer):
         # Heuristics on pegging - look at history
         # Go look at good heuristics for pegging
@@ -147,21 +141,19 @@ class MyDivider(DividePolicy):
                         score += 1
                     elif self._game.rank_value(card.rank()) > 5:
                         score += 0.5
-                
+
                 # If the total score is below 15, prioritize playing cards that go above 15
                 elif history.total_points() < 15:
                     if self._game.rank_value(card.rank()) + history.total_points() > 15:
                         score += 0.5
                     if self._game.rank_value(card.rank()) + history.total_points() == 15:
                         score += 1
-                elif  history.total_points() >= 21:
+                elif history.total_points() >= 21:
                     if self._game.rank_value(card.rank()) > 2:
-                        score += 0.5 
+                        score += 0.5
                     if self._game.rank_value(card.rank()) + history.total_points() > 29:
-                        score += 1                  
+                        score += 1
                 if score is not None and (best_score is None or score > best_score):
                     best_score = score
                     best_card = card
         return best_card
-
-

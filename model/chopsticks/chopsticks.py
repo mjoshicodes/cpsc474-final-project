@@ -13,6 +13,7 @@ P2 = 2
 Left = 1
 Right = 2
 
+
 class Game:
     def __init__(self):
         self.p1 = Hands(1, 1)
@@ -65,17 +66,21 @@ class Game:
                 if random_action == 0:
                     left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
                     opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    attack_value, attacked_hand_idx = p1_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-                    self.attack(P2, attacked_hand_idx, attack_value=attack_value)
+                    attack_value, attacked_hand_idx = p1_policy.attack(
+                        left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                    self.attack(P2, attacked_hand_idx,
+                                attack_value=attack_value)
                 else:
                     left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
                     opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    new_left_hand, new_right_hand = p1_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                    new_left_hand, new_right_hand = p1_policy.split(
+                        left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                     self.split(P1, new_left_hand, new_right_hand)
             else:
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
                 opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
-                attack_value, attacked_hand_idx = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                attack_value, attacked_hand_idx = p2_policy.attack(
+                    left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 self.attack(P1, attacked_hand_idx, attack_value=attack_value)
 
             turn += 1
@@ -86,6 +91,7 @@ class Game:
         else:
             self.reset_game()
             return (1, 0)
+
 
 def evaluate_policies(game, p1_policy, p2_policy, count):
     p1_total = 0

@@ -1,6 +1,7 @@
 import itertools as it
 import random
 
+
 class Hands:
     def __init__(self, left_hand, right_hand):
         self._left_hand = left_hand
