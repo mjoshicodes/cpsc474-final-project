@@ -1,6 +1,6 @@
 import random
 from abc import ABC, abstractmethod
-from itertools import combinations, product
+from itertools import combinations, product, combinations_with_replacement
 import scoring
 
 class ChopsticksPolicy(ABC):
@@ -9,16 +9,16 @@ class ChopsticksPolicy(ABC):
 
 
     @abstractmethod
-    def split(self, hand, scores, am_current_player):
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         pass
 
 
     @abstractmethod
-    def attack(self, cards, history, scores, am_current_player):
+    def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         pass
 
 
-    def divide(self, cards, history, scores, am_current_player):
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         pass
 
 class SplitPolicy(ABC):
@@ -27,7 +27,7 @@ class SplitPolicy(ABC):
 
 
     @abstractmethod
-    def split(self, hand, scores, am_current_player):
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         pass
 
 
@@ -37,7 +37,7 @@ class AttackPolicy(ABC):
 
 
     @abstractmethod
-    def attack(self, cards, history, scores, am_current_player):
+    def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         pass
 
 
@@ -47,7 +47,7 @@ class DividePolicy(ABC):
 
 
     @abstractmethod
-    def divide(self, hand, scores, am_current_player):
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         pass
 
 class CompositePolicy(ChopsticksPolicy):
@@ -59,29 +59,29 @@ class CompositePolicy(ChopsticksPolicy):
         self._divider = divider
 
 
-    def split(self, hand, scores, am_current_player):
-        return self._splitter.split(hand, scores, am_current_player)
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        return self._splitter.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
-    def attack(self, cards, history, scores, am_current_player):
-        return self._attacker.attack(cards, history, scores, am_current_player)
+    def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        return self._attacker.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
-    def divide(self, cards, history, scores, am_current_player):
-        return self._divider.divide(cards, history, scores, am_current_player)
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        return self._divider.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
 class RandomSplitter(SplitPolicy):
     def __init__(self, game):
         super().__init__(game)
 
 
-    def split(self, left_hand, right_hand):
-        possible_choices = []
-        if left_hand > 0 and right_hand > 0:
-            if right_hand < 4:
-                possible_choices.append((left_hand - 1, right_hand + 1))
-            else:
-                possible_choices.append((left_hand + 1, right_hand - 1))
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        my_hand_sum = left_hand + right_hand
+        possible_hand_values = list(range(0, my_hand_sum+1))
 
-        return random.choice(possible_choices)
+        if 5 in possible_hand_values:
+            possible_hand_values.remove(5)
+
+        split_combinations = [combo for combo in combinations_with_replacement(possible_hand_values, 2) if sum(combo) == my_hand_sum]
+        return random.choice(split_combinations)
 
 
 class RandomAttacker(AttackPolicy):
@@ -101,19 +101,20 @@ class RandomDivider(DividePolicy):
         super().__init__(game)
 
 
-    def divide(self, left_hand, right_hand):
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         my_hand_sum = left_hand + right_hand
         possible_hand_values = range(0, my_hand_sum + 1)
         divide_combinations = [combo for combo in combinations(possible_hand_values, 2) if sum(combo) == my_hand_sum]
         return random.choice(divide_combinations)
 
-class GreedySplit(SplitPolicy):
+class GreedySplitter(SplitPolicy):
     def __init__(self, game):
         super().__init__(game)
 
 
-    def split(self, hand, scores, am_current_player):
-        pass
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        left_hand, right_hand, reward = scoring.greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        return left_hand, right_hand
 
 class GreedyAttacker(AttackPolicy):
     def __init__(self, game):

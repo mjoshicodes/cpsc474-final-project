@@ -15,6 +15,12 @@ class Hands:
     def right_hand(self):
         return self._right_hand
 
+    def update_left_hand(self, value):
+        self._left_hand = value
+
+    def update_right_hand(self, value):
+        self._right_hand = value
+
     def transfer_right_to_left(self, transfer_sum):
         if self._left_deaths == 3 or self._left_hand + transfer_sum > 4:
             return "Not a legal move!"
