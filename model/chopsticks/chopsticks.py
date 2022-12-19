@@ -7,6 +7,8 @@ from hand import Hands
 import scoring
 import random
 
+import sys
+
 P1 = 1
 P2 = 2
 
@@ -22,6 +24,7 @@ class Game:
     def reset_game(self):
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
+
 
     def get_actions(self):
         """
@@ -84,7 +87,7 @@ class Game:
             self.attack(opponent, attacked_hand_idx, attack_value)
         else:
             new_left_hand_value, new_right_hand_value = action[1], action[2]
-            self.divide(myself, new_right_hand_value, new_left_hand_value)
+            self.divide(myself, new_left_hand_value, new_right_hand_value)
 
     def is_game_over(self):
         if self.p1.lost():
@@ -109,6 +112,7 @@ class Game:
                 random.shuffle(actions)
 
                 action = max(actions, key=lambda x: x[3])
+                print(action, " I am P1")
                 self.execute_action(self.p1, self.p2, action)
             else:
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
@@ -119,9 +123,11 @@ class Game:
                 divide_action = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
                 random.shuffle(actions)
-
                 action = max(actions, key=lambda x: x[3])
+                print(action, " I am P2")
                 self.execute_action(self.p2, self.p1, action)
+
+            print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
 
             turn += 1
 

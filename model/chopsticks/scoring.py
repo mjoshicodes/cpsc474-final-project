@@ -10,14 +10,19 @@ Right = 2
 
 
 def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+    if left_hand == 0 or right_hand == 0:
+        return None
+
     my_hand_sum = left_hand + right_hand
-    possible_hand_values = list(range(0, my_hand_sum+1))
+    possible_hand_values = list(range(1, max(left_hand, right_hand)+1))
 
     if 5 in possible_hand_values:
         possible_hand_values.remove(5)
 
-    split_combinations = [combo for combo in combinations_with_replacement(
-        possible_hand_values, 2) if sum(combo) == my_hand_sum]
+    combos = list(combinations_with_replacement(possible_hand_values, 2))
+    split_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
+    if len(split_combinations) == 0:
+            return None
 
     def score(split):
         left_hand, right_hand = split
@@ -29,13 +34,28 @@ def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
     return max(map(lambda split: score(split), split_combinations), key=lambda t: t[2])
 
+def get_valid_attacks(left_hand, right_hand):
+    valid_attacks = []
+    if left_hand != 0:
+        valid_attacks.append(left_hand)
+    if right_hand != 0:
+        valid_attacks.append(right_hand)
+
+    return valid_attacks
+
+def get_hands_available_for_attack(left_hand, right_hand):
+    valid_hands = []
+    if left_hand != 0:
+        valid_hands.append(1)
+    if right_hand != 0:
+        valid_hands.append(2)
+
+    return valid_hands
 
 def greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-    possible_attacks = [left_hand, right_hand]
-    hands_available_for_attack = [
-        1 if opponent_left_hand != 0 else None, 2 if opponent_right_hand != 0 else None]
-    attack_combinations = list(
-        product(possible_attacks, hands_available_for_attack))
+    possible_attacks = get_valid_attacks(left_hand, right_hand)
+    hands_available_for_attack = get_hands_available_for_attack(opponent_left_hand, opponent_right_hand)
+    attack_combinations = list(product(possible_attacks, hands_available_for_attack))
 
     def score(attack):
         attack_value, attacked_hand_idx = attack
@@ -53,13 +73,17 @@ def greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand
 
 
 def greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+    if left_hand != 0 or right_hand != 0:
+        return None
+
     my_hand_sum = left_hand + right_hand
-    possible_hand_values = list(range(1, my_hand_sum + 1))
+    possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)+1))
 
     if 5 in possible_hand_values:
         possible_hand_values.remove(5)
 
-    divide_combinations = [combo for combo in combinations_with_replacement(possible_hand_values, 2) if sum(combo) == my_hand_sum]
+    combos = list(combinations_with_replacement(possible_hand_values, 2))
+    divide_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
 
     if len(divide_combinations) == 0:
         return None
