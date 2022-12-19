@@ -1,7 +1,7 @@
 import random
 from abc import ABC, abstractmethod
 from itertools import combinations, product, combinations_with_replacement
-import greedy
+import greedy, rules_based
 
 
 class ChopsticksPolicy(ABC):
@@ -169,6 +169,42 @@ class GreedyDivider(DividePolicy):
 
     def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         resulting_hand_values = greedy.greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+
+        if resulting_hand_values is None:
+            return None
+
+        new_left_hand, new_right_hand, reward = resulting_hand_values
+        return ("DIVIDE", new_left_hand, new_right_hand, reward)
+
+class RulesSplitter(SplitPolicy):
+    def __init__(self, game):
+        super().__init__(game)
+
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        resulting_hand_values = rules_based.rules_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+
+        if resulting_hand_values is None:
+            return None
+
+        new_left_hand, new_right_hand, reward = resulting_hand_values
+        return ("SPLIT", new_left_hand, new_right_hand, reward)
+
+
+class RulesAttacker(AttackPolicy):
+    def __init__(self, game):
+        super().__init__(game)
+
+    def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        attack_value, attacked_hand_idx, reward = rules_based.rules_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        return ("ATTACK", attack_value, attacked_hand_idx, reward)
+
+
+class RulesDivider(DividePolicy):
+    def __init__(self, game):
+        super().__init__(game)
+
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        resulting_hand_values = rules_based.rules_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
         if resulting_hand_values is None:
             return None
