@@ -23,12 +23,6 @@ class Game:
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
 
-    def attack(self, attacked_player, attacked_hand, attack_value):
-        if attacked_hand == Left:
-            attacked_player.attack_left(attack_value)
-        else:
-            attacked_player.attack_right(attack_value)
-
     def get_actions(self):
         """
             Gets all the actions that the next player is able to perform.
@@ -69,6 +63,12 @@ class Game:
         player.update_left_hand(new_left_hand_value)
         player.update_right_hand(new_right_hand_value)
 
+    def attack(self, attacked_player, attacked_hand, attack_value):
+        if attacked_hand == Left:
+            attacked_player.attack_left(attack_value)
+        else:
+            attacked_player.attack_right(attack_value)
+
     def divide(self, player, new_left_hand_value, new_right_hand_value):
         player.update_left_hand(new_left_hand_value)
         player.update_right_hand(new_right_hand_value)
@@ -95,8 +95,6 @@ class Game:
             return False
 
     def play(self, p1_policy, p2_policy, log):
-        p1 = 0
-        p2 = 1
         turn = 0
 
         while not self.is_game_over():
