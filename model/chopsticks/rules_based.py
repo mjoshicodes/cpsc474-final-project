@@ -109,9 +109,18 @@ def rules_division(left_hand, right_hand, opponent_left_hand, opponent_right_han
         else:
             return left_hand, right_hand, 1
 
-    # all_actions = map(lambda divide: score(divide), divide_combinations)
-    return max(map(lambda split: score(split), divide_combinations), key=lambda t: t[2])
+    all_actions = list(map(lambda attack: score(attack), divide_combinations))
 
+    best_action, best_score = all_actions[0], float('-inf')
+    for action in all_actions:
+        left_hand, right_hand, action_score = action
+        action_score += 1.0
+
+        if action_score > best_score:
+            best_action = (left_hand, right_hand, action_score)
+            best_score = action_score
+
+    return best_action
 
 
 def does_attack_kill_hand(attack_value, opponent):

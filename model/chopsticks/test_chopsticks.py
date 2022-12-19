@@ -33,6 +33,7 @@ if __name__ == "__main__":
     print(f"Playing chopsticks with {games} games")
     print(f"P1: Random Agent won {results[0]} percent of games")
     print(f"P2: Rules Based Agent won {results[1]} percent of games")
+    print()
     #################################################################################
 
 
