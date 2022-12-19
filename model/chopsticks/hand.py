@@ -16,6 +16,12 @@ class Hands:
     def right_hand(self):
         return self._right_hand
 
+    def left_deaths(self):
+        return self._left_deaths
+
+    def right_deaths(self):
+        return self._right_deaths
+
     def update_left_hand(self, value):
         self._left_hand = value
 
