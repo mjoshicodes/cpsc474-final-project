@@ -76,8 +76,7 @@ class RandomSplitter(SplitPolicy):
         if 5 in possible_hand_values:
             possible_hand_values.remove(5)
 
-        split_combinations = [combo for combo in combinations_with_replacement(
-            possible_hand_values, 2) if sum(combo) == my_hand_sum]
+        split_combinations = [combo for combo in combinations_with_replacement(possible_hand_values, 2) if sum(combo) == my_hand_sum]
         return random.choice(split_combinations)
 
 
@@ -87,10 +86,8 @@ class RandomAttacker(AttackPolicy):
 
     def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         possible_attacks = [left_hand, right_hand]
-        hands_available_for_attack = [
-            1 if opponent_left_hand != 0 else None, 2 if opponent_right_hand != 0 else None]
-        attack_combinations = list(
-            product(possible_attacks, hands_available_for_attack))
+        hands_available_for_attack = [1 if opponent_left_hand != 0 else None, 2 if opponent_right_hand != 0 else None]
+        attack_combinations = list(product(possible_attacks, hands_available_for_attack))
         return random.choice(attack_combinations)
 
 
@@ -100,9 +97,16 @@ class RandomDivider(DividePolicy):
 
     def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         my_hand_sum = left_hand + right_hand
-        possible_hand_values = range(0, my_hand_sum + 1)
-        divide_combinations = [combo for combo in combinations(
-            possible_hand_values, 2) if sum(combo) == my_hand_sum]
+        possible_hand_values = list(range(1, my_hand_sum + 1))
+
+        if 5 in possible_hand_values:
+            possible_hand_values.remove(5)
+
+        divide_combinations = [combo for combo in combinations_with_replacement(possible_hand_values, 2) if sum(combo) == my_hand_sum]
+
+        if len(divide_combinations) == 0:
+            return None
+
         return random.choice(divide_combinations)
 
 
@@ -111,9 +115,8 @@ class GreedySplitter(SplitPolicy):
         super().__init__(game)
 
     def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-        left_hand, right_hand, reward = scoring.greedy_split(
-            left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-        return left_hand, right_hand
+        new_left_hand, new_right_hand, reward = scoring.greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        return new_left_hand, new_right_hand
 
 
 class GreedyAttacker(AttackPolicy):
@@ -121,8 +124,7 @@ class GreedyAttacker(AttackPolicy):
         super().__init__(game)
 
     def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-        attack_value, attacked_hand_idx, reward = scoring.greedy_attack(
-            left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        attack_value, attacked_hand_idx, reward = scoring.greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
         return attack_value, attacked_hand_idx
 
 
@@ -130,5 +132,11 @@ class GreedyDivider(DividePolicy):
     def __init__(self, game):
         super().__init__(game)
 
-    def divide(self):
-        pass
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        resulting_hand_values = scoring.greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+
+        if resulting_hand_values is None:
+            return None
+
+        new_left_hand, new_right_hand, reward = resulting_hand_values
+        return new_left_hand, new_right_hand

@@ -61,7 +61,7 @@ class Hands:
         return self._right_hand == 0
 
     def lost(self):
-        return self.left_dead() and self.right_dead()
+        return (self.left_dead() and self.right_dead()) or (self._left_deaths == 3 and self._right_deaths == 3)
 
     def __hash__(self):
         return self._hash

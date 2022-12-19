@@ -52,8 +52,27 @@ def greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand
     return max(map(lambda attack: score(attack), attack_combinations), key=lambda t: t[2])
 
 
-def greedy_divison(myself, opponent):
-    pass
+def greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+    my_hand_sum = left_hand + right_hand
+    possible_hand_values = list(range(1, my_hand_sum + 1))
+
+    if 5 in possible_hand_values:
+        possible_hand_values.remove(5)
+
+    divide_combinations = [combo for combo in combinations_with_replacement(possible_hand_values, 2) if sum(combo) == my_hand_sum]
+
+    if len(divide_combinations) == 0:
+        return None
+
+    def score(divide):
+        left_hand, right_hand = divide
+
+        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5:
+            return left_hand, right_hand, -1
+        else:
+            return left_hand, right_hand, 1
+
+    return max(map(lambda divide: score(divide), divide_combinations), key=lambda t: t[2])
 
 
 def does_attack_kill_hand(attack_value, opponent):
