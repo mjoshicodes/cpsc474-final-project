@@ -92,16 +92,14 @@ def q_learn(model, limit):
     "Returns a function that takes a non-terminal position in the game"
 
     # Multiplying limit to deal with warning
-    q = QLearn(model, limit * .9999, model.offensive_playbook_size())
+    q = QLearn(model, limit * .9999, model.p1_action_size())
     q.q_learning()
 
     def policy(pos):
 
         """Returns index of selected offensive play"""
-        best_action = 1
+        _, best_action = q.choose_best_action(pos)
         return best_action
-        # _, best_action = q.choose_best_action(pos)
-        # return best_action
 
     return policy
 
