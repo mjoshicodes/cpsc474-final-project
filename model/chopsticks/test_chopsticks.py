@@ -16,8 +16,8 @@ if __name__ == "__main__":
     submission = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
 
     results = evaluate_policies(game, benchmark, submission, games)
-    print(f"P1 won {results[0]} percent of games")
-    print(f"P2 won {results[1]} percent of games")
+    print(f"P1: Random Agent won {results[0]} percent of games")
+    print(f"P2: Greedy Agent won {results[1]} percent of games")
 
     #################################################################################
 
