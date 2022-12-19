@@ -2,20 +2,25 @@ from datetime import datetime
 from random import choice
 from math import log
 
+
 def mcts_policy(time):
     tree = {}
+
     def mcts_function(position):
         move = mcts_helper(position, time, tree)
         return move
     return mcts_function
 
+
 def exploit_value(tree, node):
     return tree[node][0] / tree[node][1]
+
 
 def explore_value(tree, node, successor):
     constant = 2 ** 0.5
     sqrt_value = (log(tree[node][1] + 1) / tree[successor][1]) ** 0.5
     return constant * sqrt_value
+
 
 def ucb(node, tree):
     successors = tree[node][3]
@@ -36,11 +41,13 @@ def ucb(node, tree):
                 optimal_node = node_successor
     return optimal_node
 
+
 def contains_node_to_visit(node, tree):
     for successor in tree[node][3]:
         if not successor in tree:
             return [True, successor]
     return [False, None]
+
 
 def traverse(root, tree):
     pointer_to_visit = root
@@ -61,17 +68,20 @@ def traverse(root, tree):
     tree[pointer_to_visit] = [0, 0, actions, successors]
     payoff = simulate(pointer_to_visit)
     backtrack(path, payoff, tree)
-    
+
+
 def simulate(node):
     while not node.is_terminal():
         actions = node.get_actions()
         node = node.successor(choice(actions))
     return node.payoff()
 
+
 def backtrack(path, payoff, tree):
     for node in path:
         tree[node][0] += payoff
         tree[node][1] += 1
+
 
 def mcts_helper(position, time, dictionary):
     # Get current time
@@ -90,7 +100,7 @@ def mcts_helper(position, time, dictionary):
         if state in dictionary:
             root_exploit_value = exploit_value(dictionary, state)
             if (
-                (position.actor() == 0 and root_exploit_value > optimal_value) or 
+                (position.actor() == 0 and root_exploit_value > optimal_value) or
                 (position.actor() == 1 and root_exploit_value < optimal_value)
             ):
                 optimal_value = root_exploit_value
@@ -98,5 +108,5 @@ def mcts_helper(position, time, dictionary):
     return optimal_action
 
 # UCB 2
-# Edge dictionary: Key is edge, 
-# next node to visit, 
+# Edge dictionary: Key is edge,
+# next node to visit,

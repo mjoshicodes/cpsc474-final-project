@@ -1,6 +1,7 @@
 import itertools as it
 import random
 
+
 class Hands:
     def __init__(self, left_hand, right_hand):
         self._left_hand = left_hand
@@ -15,11 +16,11 @@ class Hands:
     def right_hand(self):
         return self._right_hand
 
-    def left_deaths(self):
-        return self._left_deaths
+    def update_left_hand(self, value):
+        self._left_hand = value
 
-    def right_deaths(self):
-        return self._right_deaths
+    def update_right_hand(self, value):
+        self._right_hand = value
 
     def transfer_right_to_left(self, transfer_sum):
         if self._left_deaths == 3 or self._left_hand + transfer_sum > 4:
@@ -39,7 +40,7 @@ class Hands:
         new_sum = (self._left_hand + attack_sum) % 5
         if new_sum == 0:
             self._left_deaths += 1
-            print("Left Hand Dead")
+            # print("Left Hand Dead")
         self._left_hand = new_sum
         return True
 
@@ -49,7 +50,7 @@ class Hands:
         new_sum = (self._right_hand + attack_sum) % 5
         if new_sum == 0:
             self._right_deaths += 1
-            print("Right Hand Dead")
+            # print("Right Hand Dead")
         self._right_hand = new_sum
         return True
 
