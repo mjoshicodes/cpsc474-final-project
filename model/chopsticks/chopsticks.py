@@ -4,7 +4,6 @@ import sys
 from enum import Enum
 from hand import Hands
 
-import scoring
 import random
 
 import sys
@@ -112,7 +111,7 @@ class Game:
                 random.shuffle(actions)
 
                 action = max(actions, key=lambda x: x[3])
-                print(action, " I am P1")
+                # print(action, " I am P1")
                 self.execute_action(self.p1, self.p2, action)
             else:
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
@@ -124,10 +123,10 @@ class Game:
                 actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
                 random.shuffle(actions)
                 action = max(actions, key=lambda x: x[3])
-                print(action, " I am P2")
+                # print(action, " I am P2")
                 self.execute_action(self.p2, self.p1, action)
 
-            print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
+            # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
 
             turn += 1
 

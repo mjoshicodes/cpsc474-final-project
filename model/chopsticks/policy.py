@@ -1,7 +1,7 @@
 import random
 from abc import ABC, abstractmethod
 from itertools import combinations, product, combinations_with_replacement
-import scoring
+import greedy
 
 
 class ChopsticksPolicy(ABC):
@@ -145,7 +145,7 @@ class GreedySplitter(SplitPolicy):
         super().__init__(game)
 
     def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-        resulting_hand_values = scoring.greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        resulting_hand_values = greedy.greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
         if resulting_hand_values is None:
             return None
@@ -159,7 +159,7 @@ class GreedyAttacker(AttackPolicy):
         super().__init__(game)
 
     def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-        attack_value, attacked_hand_idx, reward = scoring.greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        attack_value, attacked_hand_idx, reward = greedy.greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
         return ("ATTACK", attack_value, attacked_hand_idx, reward)
 
 
@@ -168,7 +168,7 @@ class GreedyDivider(DividePolicy):
         super().__init__(game)
 
     def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-        resulting_hand_values = scoring.greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        resulting_hand_values = greedy.greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
         if resulting_hand_values is None:
             return None
