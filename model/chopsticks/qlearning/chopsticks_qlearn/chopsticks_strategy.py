@@ -17,7 +17,7 @@ class ChopsticksStrategy:
         ''' Returns the initial position in this game as a
             (p1_left_hand, p1_right_hand, p2_left_hand, p2_right_hand) tuple.
         '''
-        return (5, 5, 5, 5)
+        return (1, 1, 1, 1)
 
 
     def p1_action_size(self):
