@@ -4,28 +4,30 @@ def play(inputState, startingPlayer):
     alreadySolvedStates = {}
     stateQueue = Queue()
     stateQueue.put(startNode)
- 
+
     while not stateQueue.empty():
         currentState = stateQueue.get()
         if isinstance(currentState, ExploredState):
             continue
- 
+
         if checkForWin(currentState.getState()):
             currentState.setWinner(not currentState.isPlayer())
             continue
- 
+
         possibleStates = getFollowingMoves(currentState)
         for state in possibleStates:
             if (state, not currentState.isPlayer()) in alreadySolvedStates:
-                currentState.addChildren(ExploredState(alreadySolvedStates[(state, not currentState.isPlayer())]))
+                currentState.addChildren(ExploredState(
+                    alreadySolvedStates[(state, not currentState.isPlayer())]))
             else:
                 newNodeState = GameState(state, not currentState.isPlayer())
                 newNodeState.setParent(stateQueue)
                 currentState.addChildren(newNodeState)
-                alreadySolvedStates[(state, not currentState.isPlayer())] = newNodeState
- 
+                alreadySolvedStates[(
+                    state, not currentState.isPlayer())] = newNodeState
+
                 stateQueue.put(newNodeState)
- 
+
     return startNode
 
 

@@ -11,11 +11,11 @@ class Game:
         # in the accessor?
         self._throw_indices = list(it.combinations(range(self.keep_cards() + self.throw_cards()), self.throw_cards()))
 
-        
+
     def all_ranks(self):
         return range(1, 14)
 
-    
+
     def all_suits(self):
         return ['S', 'H', 'D', 'C']
 
@@ -27,23 +27,23 @@ class Game:
         """
         return min(rank, 10)
 
-    
+
     def all_values(self):
         return range(1, 11)
 
-    
+
     def fifteen_value(self):
         return 2
 
-    
+
     def pair_value(self):
         return 2
 
 
     def turn_card_value(self, card):
         return 2 if card.rank() == 11 else 0
-    
-    
+
+
     def straight_value(self, length, count):
         if length >= 3:
             return length * count
@@ -56,8 +56,8 @@ class Game:
             return 1
         else:
             return 0
-        
-    
+
+
     def hand_flush_value(self, size):
         if size >= 4:
             return size
@@ -82,8 +82,8 @@ class Game:
 
     def throw_indices(self):
         return self._throw_indices[:]
-    
-    
+
+
     def pegging_limit(self):
         return 31
 
@@ -91,7 +91,7 @@ class Game:
     def pegging_exact_value(self, go):
         return 1 if go else 2
 
-        
+
     def peg_pair_value(self, count):
         if count < 2:
             return 0
@@ -106,10 +106,10 @@ class Game:
     def peg_straight_value(self, length):
         return 0 if length < 3 else length
 
-        
+
     def peg_sum_value(self, total):
         return 2 if total == 15 else 0
-    
+
 
     def winning_score(self):
         return 121
@@ -141,11 +141,11 @@ class Game:
 
             return points * (1 if p0_score > p1_score else -1)
 
-        
+
     def deck(self):
         return Deck(self.all_ranks(), self.all_suits(), 1)
-    
-        
+
+
     def deal(self, count):
         deck = Deck(self.all_ranks(), self.all_suits(), 1)
         deck.shuffle()
@@ -178,7 +178,7 @@ class Game:
 
         # if no problems yet, everything must have matched
         return part_size == len(hand)
-    
+
 
     def play(self, p0_policy, p1_policy, log):
         scores = [0, 0]
@@ -205,7 +205,7 @@ class Game:
             for p in [0, 1]:
                 if not self.is_legal_split(hands[p], keeps[p]):
                     raise Exception("split does not partition hand")
-                
+
             scores[dealer] += self.turn_card_value(turn)
             log("Turn: " + str(turn) + " " + str(scores))
 
@@ -225,7 +225,7 @@ class Game:
                         raise Exception("passing when has legal play")
                     elif play is not None and not history.is_legal(self, play, 0 if peg_turn == dealer else 1):
                         raise Exception("invalid card")
-                    
+
                     if play is None:
                         passes[peg_turn] = True
                     else:
@@ -247,12 +247,12 @@ class Game:
                     new_cards = [card for card in peg_cards[peg_turn] if card != play]
                     if len(new_cards) == len(peg_cards[peg_turn]):
                         raise Exception("played card not in hand")
-                    
+
                     peg_cards[peg_turn] = new_cards
-                    
+
                 # next player's turn
                 peg_turn = 1 - peg_turn
-                
+
                 if sum(1 if passed else 0 for passed in passes) == 2:
                     # both players passed; reset for next round of pegging
                     passes = [False, False]
@@ -280,9 +280,9 @@ class Game:
                 log("CRIB: " + str(crib) + str(hand_score))
                 scores[dealer] += hand_score[0]
                 log(scores)
-            
+
             dealer = 1 - dealer
-            
+
         return self.game_value(*scores), handsPlayed
 
 
@@ -314,7 +314,7 @@ def evaluate_policies(game, p0_policy, p1_policy, count):
             p0_total += p0_pts
         else:
             p1_total += -p0_pts
-            
+
         total_hands += results[1]
 
     return (p0_total - p1_total) / count, p0_total / count, p1_total / count, scores, total_hands / count
