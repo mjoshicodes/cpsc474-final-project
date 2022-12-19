@@ -35,6 +35,35 @@ class Game:
         else:
             attacked.attack_right(attack_value)
 
+    def get_actions(self):
+        """
+            Gets all the actions that the next player is able to perform.
+            Returns:
+                actions:    dictionary consisting of three keys: "attack", "divide", and "split", 
+                            each holding an array of actions for that respective type of move.
+        """
+        actions, p1_hands, p2_hands = {}, [], []
+        if not self.p1.left_deaths() == 3:
+            p1_hands.append((self.p1.left_hand(),  Left))
+        if not self.p1.right_deaths() == 3:
+            p1_hands.append((self.p1.right_hand(), Right))
+        if not self.p2.left_deaths() == 3:
+            p2_hands.append((self.p2.left_hand(), Left))
+        if not self.p2.right_deaths() == 3:
+            p2_hands.append((self.p2.right_hand(), Right))
+        attack_actions = []
+        split_actions = []
+        divide_actions = []
+        if self.turn == P1:
+            for hand in p1_hands:
+                for attackable_hand in p2_hands:
+                    attack_actions.append((P2, attackable_hand[1]))
+        else:
+            for hand in p2_hands:
+                pass
+        actions["attack"] = attack_actions
+        return actions
+
     def transfer(self, player_idx, tranfer_hand, transfer_value):
         player = self.p1 if player_idx == 1 else self.p2
         if tranfer_hand == Left:
