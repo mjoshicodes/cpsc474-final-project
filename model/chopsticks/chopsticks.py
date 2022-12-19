@@ -23,23 +23,17 @@ class Game:
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
 
-    def attack(self, attacked_player_idx, attacked_hand, attacker_hand=None, attack_value=None):
-        attacked = self.p1 if attacked_player_idx == P1 else self.p2
-        attacker = self.p1 if attacked_player_idx == P2 else self.p2
-
-        if attacker_hand is not None:
-            attack_value = attacker.left_hand() if attacker_hand == Left else attacker.right_hand()
-
+    def attack(self, attacked_player, attacked_hand, attack_value):
         if attacked_hand == Left:
-            attacked.attack_left(attack_value)
+            attacked_player.attack_left(attack_value)
         else:
-            attacked.attack_right(attack_value)
+            attacked_player.attack_right(attack_value)
 
     def get_actions(self):
         """
             Gets all the actions that the next player is able to perform.
             Returns:
-                actions:    dictionary consisting of three keys: "attack", "divide", and "split", 
+                actions:    dictionary consisting of three keys: "attack", "divide", and "split",
                             each holding an array of actions for that respective type of move.
         """
         actions, p1_hands, p2_hands = {}, [], []
@@ -71,15 +65,26 @@ class Game:
         else:
             player.transfer_right_to_left(transfer_value)
 
-    def split(self, player_idx, new_left_hand_value, new_right_hand_value):
-        player = self.p1 if player_idx == 1 else self.p2
+    def split(self, player, new_left_hand_value, new_right_hand_value):
         player.update_left_hand(new_left_hand_value)
         player.update_right_hand(new_right_hand_value)
 
-    def divide(self, player_idx, new_left_hand_value, new_right_hand_value):
-        player = self.p1 if player_idx == 1 else self.p2
+    def divide(self, player, new_left_hand_value, new_right_hand_value):
         player.update_left_hand(new_left_hand_value)
         player.update_right_hand(new_right_hand_value)
+
+    def execute_action(self, myself, opponent, action):
+        action_type = action[0]
+
+        if action_type == "SPLIT":
+            new_left_hand_value, new_right_hand_value = action[1], action[2]
+            self.split(myself, new_left_hand_value, new_right_hand_value)
+        elif action_type == "ATTACK":
+            attack_value, attacked_hand_idx = action[1], action[2]
+            self.attack(opponent, attacked_hand_idx, attack_value)
+        else:
+            new_left_hand_value, new_right_hand_value = action[1], action[2]
+            self.divide(myself, new_right_hand_value, new_left_hand_value)
 
     def is_game_over(self):
         if self.p1.lost():
@@ -96,64 +101,30 @@ class Game:
 
         while not self.is_game_over():
             if turn % 2 == 0:
-                random_action = random.randint(1, 3)
-                if random_action == 1:
-                    left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    resulting_move = p1_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
+                opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
 
-                    if resulting_move is None:
-                        continue
+                split_action = p1_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                attack_action = p1_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                divide_action = p1_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
+                random.shuffle(actions)
 
-                    attack_value, attacked_hand_idx = resulting_move
-                    self.attack(P2, attacked_hand_idx, attack_value=attack_value)
-                elif random_action == 2:
-                    left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    resulting_move = p1_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-
-                    if resulting_move is None:
-                            continue
-
-                    new_left_hand, new_right_hand = resulting_move
-                    self.split(P1, new_left_hand, new_right_hand)
-                else:
-                    left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    resulting_move = p1_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-
-                    if resulting_move is None:
-                            continue
-
-                    new_left_hand, new_right_hand = resulting_move
-                    self.divide(P1, new_left_hand, new_right_hand)
+                action = max(actions, key=lambda x: x[3])
+                self.execute_action(self.p1, self.p2, action)
             else:
-                random_action = random.randint(1, 3)
-                if random_action == 1:
-                    left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    attack_value, attacked_hand_idx = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-                    self.attack(P1, attacked_hand_idx, attack_value=attack_value)
-                elif random_action == 2:
-                    left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    resulting_move = p2_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
+                opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
 
-                    if resulting_move is None:
-                            continue
+                split_action = p2_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                attack_action = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                divide_action = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
+                random.shuffle(actions)
 
-                    new_left_hand, new_right_hand = resulting_move
-                    self.split(P2, new_left_hand, new_right_hand)
-                else:
-                    left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
-                    opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
-                    resulting_move = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                action = max(actions, key=lambda x: x[3])
+                self.execute_action(self.p2, self.p1, action)
 
-                    if resulting_move is None:
-                            continue
-
-                    new_left_hand, new_right_hand = resulting_move
-                    self.divide(P2, new_left_hand, new_right_hand)
             turn += 1
 
         if self.p1.lost():
@@ -162,7 +133,6 @@ class Game:
         else:
             self.reset_game()
             return (1, 0)
-
 
 def evaluate_policies(game, p1_policy, p2_policy, count):
     p1_total = 0
