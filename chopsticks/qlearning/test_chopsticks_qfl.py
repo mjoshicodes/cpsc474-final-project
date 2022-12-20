@@ -21,8 +21,6 @@ if __name__ == "__main__":
     start = time.time()
     policy = chopsticks_qfl.q_learn(model, limit)
     t = time.time() - start
-    # if t > limit:
-    #     print("WARNING: Q-learning ran for", t, "seconds; allowed", limit)
 
     print ("TEST 1: Q-Learning against a Random Agent")
     
@@ -30,4 +28,8 @@ if __name__ == "__main__":
 
     print ("TEST 2: Q-Learning against a Greedy Agent")
 
-    print("We are using Q-learning to play Chopsticks against a Greedy Strategy. Here is my winning percentage over ", n, "games:", model.simulate_greedy(policy, n))
+    test_limit = 10
+    t = time.time()
+    while t < test_limit:
+        val, n = model.simulate_greedy(policy, n)
+    print("Running against a greedy strategy, which our optimal solution, and therefore will run indefintely")
