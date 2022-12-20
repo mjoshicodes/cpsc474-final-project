@@ -123,13 +123,13 @@ class ChopsticksStrategy:
         wins = 0
         play_count = 0
         for i in range(n):
-            print("running game", i)
+            # print("running game", i)
             self.reset_game()
             while not self.game_over():
                 pos = self._game.return_position()
                 play_count += 1
                 self.result(policy(pos))
-            print(self._game.return_position())
+            # print(self._game.return_position())
             if self.win():
                 wins += 1
         return wins / n
