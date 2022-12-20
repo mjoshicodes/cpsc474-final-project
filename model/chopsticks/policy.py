@@ -139,7 +139,6 @@ class RandomDivider(DividePolicy):
         new_left_hand, new_right_hand = random.choice(divide_combinations)
         return ("DIVIDE", new_left_hand, new_right_hand, 0)
 
-
 class GreedySplitter(SplitPolicy):
     def __init__(self, game):
         super().__init__(game)
