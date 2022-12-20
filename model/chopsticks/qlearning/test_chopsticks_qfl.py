@@ -24,4 +24,5 @@ if __name__ == "__main__":
     # if t > limit:
     #     print("WARNING: Q-learning ran for", t, "seconds; allowed", limit)
     
-    print("Q-learning model beats a random agent at a ratio of", model.simulate(policy, n))
+    print("Q-learning model wins against random agent at a ratio of", model.simulate(policy, n))
+    print("Q-learning model wins against greedy agent at a ratio of", model.simulate_greedy(policy, n))
