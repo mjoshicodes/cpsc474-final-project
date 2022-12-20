@@ -11,14 +11,6 @@ class ChopsticksStrategy:
             prob -- a probability distribution over the tuples in plays[o][d]
         '''
         self._game = Game()
-        # self._simulate_game = Game()
-        # self._p1_plays = None
-        # self._p2_plays = None
-        # self._prob = prob
-    
-    # def get_all_possible_moves(self):
-    #     actions = self._game.get_actions()
-    #     print(actions)
 
 
     def get_all_moves(self, player):
@@ -46,7 +38,7 @@ class ChopsticksStrategy:
         return len(self.get_all_moves(self._game.p2))
     
     
-    def result(self, p1_play):
+    def result(self, p1_index):
         ''' Executes selected play and chooses a random play for p2 to execute
         
             Returns the position that results from the given offensive play
@@ -58,16 +50,21 @@ class ChopsticksStrategy:
             offensive_play -- the index of an offensive play
         '''
 
+        p1_actions = self.get_all_moves(self._game.p1)
+        p1_play = p1_actions[p1_index]
+
         # execute p1 move
         self._game.execute_action(self._game.p1, self._game.p2, p1_play)
 
         # choose random p2 move
         p2_actions = self.get_all_moves(self._game.p2)
         p2_size = len(p2_actions) - 1
-        p2_random_action = random.randint(0, p2_size)
-        p2_play = p2_actions[p2_random_action]
-        #play p2
-        self._game.execute_action(self._game.p2, self._game.p1, p2_play)
+        # print("P2 SIZE", p2_size)
+        if p2_size > 0:
+            p2_random_action = random.randint(0, p2_size)
+            p2_play = p2_actions[p2_random_action]
+            #play p2
+            self._game.execute_action(self._game.p2, self._game.p1, p2_play)
 
         # return the position of the game
         return self._game.return_position()
@@ -79,6 +76,13 @@ class ChopsticksStrategy:
         '''
         return self._game.is_game_over()
 
+    def game_over_pos(self, pos):
+        p1_l, p1_r, p2_l, p2_r = pos
+        if (p1_l <= 0 and p1_r <= 0) or (p2_l <= 0 and p2_r <= 0):
+            return True
+        else:
+            return False
+
 
     def win(self):
         ''' Determines if the given position represents a game-won position.
@@ -86,6 +90,13 @@ class ChopsticksStrategy:
             pos -- a tuple (field_pos, down, distance, time)
         '''
         return self._game.p2.lost()
+    
+    def win_pos(self, pos):
+        _, _, p2_l, p2_r = pos
+        if p2_l <= 0 and p2_r <= 0:
+            return True
+        else:
+            return False
 
     def simulate(self, policy, n):
         ''' Simulates games using the given policy and returns the
@@ -107,4 +118,4 @@ class ChopsticksStrategy:
 
 if __name__ == "__main__":
     strategy = ChopsticksStrategy()
-    strategy.get_all_possible_moves()
+    print(strategy.initial_position())
