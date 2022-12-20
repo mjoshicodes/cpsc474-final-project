@@ -116,6 +116,8 @@ class MCTS():
         actions = pointer_to_visit.get_actions()
         shuffle(actions)
         successors = [pointer_to_visit.simulate_action(action) for action in actions]
+        for successor in successors:
+            print(successor)
         tree[pointer_to_visit] = [0, 0, actions, successors]
         payoff = self.simulate(pointer_to_visit)
         self.backpropogate(path, payoff, tree)
@@ -161,6 +163,8 @@ class MCTS():
             actions = position.get_actions()
             shuffle(actions)
             successors = [position.simulate_action(action) for action in actions]
+            for successor in successors:
+                print(successor)
             tree[position] = [0, 0, actions, successors]
         while time() - start_time <= duration:
             self.traverse(position, tree)
