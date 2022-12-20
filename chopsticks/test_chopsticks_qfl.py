@@ -7,7 +7,7 @@ import chopsticks_qfl
 
 if __name__ == "__main__":
     limit = 9
-    n = 25
+    n = 250000
     model = chopsticks.ChopsticksStrategy()
     start = time.time()
     policy = chopsticks_qfl.q_learn(model, limit)
@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     print ("TEST 1: Q-Learning against a Random Agent")
     
-    print("We are using Q-learning to play Chopsticks against a Random Strategy. Here is my winning percentage over ", n, "games:", model.simulate(policy, n))
+    print("We are using Q-learning to play Chopsticks against a Random Strategy. Here is my winning percentage over", n, "games:", model.simulate(policy, n))
 
     print ("TEST 2: Q-Learning against a Greedy Agent")
 
