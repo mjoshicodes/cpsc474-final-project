@@ -42,24 +42,26 @@ class Game:
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
 
+    def update_turn(self, turn):
+        self._turn = turn
+
     def next_turn(self):
         if self._turn == P1:
-            self._turn = P2
+            self.update_turn(P2)
         else:
-            self._turn = P1
+            self.update_turn(P1)
 
     def make_copy(self):
         new_game = Game()
         new_game.p1.update_left_hand(self.p1.left_hand())
-        new_game.p1.update_right_hand(self.p1.update_right_hand())
+        new_game.p1.update_right_hand(self.p1.right_hand())
         new_game.p2.update_left_hand(self.p2.left_hand())
-        new_game.p2.update_right_hand(self.p2.update_right_hand())
+        new_game.p2.update_right_hand(self.p2.right_hand())
         new_game.p1.update_left_deaths(self.p1.left_deaths())
         new_game.p1.update_right_deaths(self.p1.right_deaths())
         new_game.p2.update_left_deaths(self.p1.left_deaths())
-        new_game.p2.update_right_deaths(self.p2.update_right_deaths())
-        if self._turn == P2:
-            new_game.next_turn()
+        new_game.p2.update_right_deaths(self.p2.right_deaths())
+        new_game.update_turn(self._turn)
         return new_game
 
     def actor(self):
@@ -225,7 +227,6 @@ class Game:
                 action = max(actions, key=lambda x: x[3])
                 self.execute_action(self.p1, self.p2, action)
             else:
-
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
                 opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
 
@@ -233,10 +234,37 @@ class Game:
                 attack_action = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 divide_action = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
-                # print("actions: ", actions)
                 random.shuffle(actions)
                 action = max(actions, key=lambda x: x[3])
-                # print("chosen action: ", action)
+                self.execute_action(self.p2, self.p1, action)
+
+            # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
+
+            self.next_turn()
+
+        if self.p1.lost():
+            self.reset_game()
+            return (0, 1)
+        else:
+            self.reset_game()
+            return (1, 0)
+        
+    def play_mcts(self, p1_policy, p2_policy):
+        while not self.is_game_over():
+            if self._turn == P1:
+                player_1_policy = p1_policy()
+                action = player_1_policy(self.make_copy())
+                self.execute_action(self.p1, self.p2, action)
+            else:
+                left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
+                opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
+
+                split_action = p2_policy.split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                attack_action = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                divide_action = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+                actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
+                random.shuffle(actions)
+                action = max(actions, key=lambda x: x[3])
                 self.execute_action(self.p2, self.p1, action)
 
             # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
@@ -250,11 +278,21 @@ class Game:
             self.reset_game()
             return (1, 0)
 
+def evaluate_mcts_policies(game, p1_policy, p2_policy, count):
+    p1_total = 0
+    p2_total = 0
+    for _ in range(count):
+        results = game.play_mcts(p1_policy, p2_policy)
+        p1_total += results[0]
+        p2_total += results[1]
+
+    return (p1_total / count, p2_total / count)
+
 def evaluate_policies(game, p1_policy, p2_policy, count):
     p1_total = 0
     p2_total = 0
 
-    for g in range(count):
+    for _ in range(count):
         results = game.play(p1_policy, p2_policy, lambda mess: None)
         p1_total += results[0]
         p2_total += results[1]
