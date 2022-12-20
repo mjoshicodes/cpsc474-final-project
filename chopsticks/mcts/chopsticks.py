@@ -162,6 +162,7 @@ class Game:
                     if new_sum == 0:
                         next_position.p2.update_right_deaths(next_position.p2.right_deaths() + 1)
                     next_position.p2.update_right_hand(new_sum)
+                next_position.next_turn()
             else:
                 if attacked_hand_idx == Left:
                     new_sum = (next_position.p1.left_hand() + attack_value) % 5
@@ -178,6 +179,7 @@ class Game:
             if self._turn == P1:
                 next_position.p1.update_left_hand(new_left_hand_value)
                 next_position.p1.update_right_hand(new_right_hand_value)
+                next_position.next_turn()
             else:
                 next_position.p2.update_left_hand(new_left_hand_value)
                 next_position.p2.update_right_hand(new_right_hand_value)
