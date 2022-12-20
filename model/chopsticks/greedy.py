@@ -30,13 +30,14 @@ def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
     def score(old_hand, split):
         old_left_hand, old_right_hand = old_hand
         left_hand, right_hand = split
-
+        reward = 0
+        
         if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
-            return (left_hand, right_hand, -1)
-        elif old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
-            return (left_hand, right_hand, 1)
-        else:
-            return (left_hand, right_hand, 0)
+            reward -= 1
+        if old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
+            reward += 1
+
+        return (left_hand, right_hand, reward)
 
     return max(map(lambda split: score(old_hand, split), split_combinations), key=lambda t: t[2])
 
