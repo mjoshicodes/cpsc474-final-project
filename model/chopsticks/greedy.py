@@ -16,11 +16,6 @@ def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
     old_hand = (left_hand, right_hand)
 
-    # my_hand_sum = left_hand + right_hand
-    # possible_hand_values = [hand for hand in list(range(0, my_hand_sum + 1)) if hand < 5]
-
-    # combos = list(combinations_with_replacement(possible_hand_values, 2))
-    # split_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
     split_combinations = get_split_combinations(left_hand, right_hand)
 
     # print(left_hand, right_hand, split_combinations)
@@ -96,16 +91,15 @@ def greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_ha
     if len(divide_combinations) == 0:
         return None
 
-    def score(old_hand, split):
+    def score(old_hand, divide):
         old_left_hand, old_right_hand = old_hand
-        left_hand, right_hand = split
-
+        left_hand, right_hand = divide
+        reward = 0 
         if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
-            return (left_hand, right_hand, -1)
+            reward -= 1
         elif old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
-            return (left_hand, right_hand, 1)
-        else:
-            return (left_hand, right_hand, 0)
+            reward += 1
+        return (left_hand, right_hand, reward)
 
 
     return max(map(lambda divide: score(old_hand, divide), divide_combinations), key=lambda t: t[2])

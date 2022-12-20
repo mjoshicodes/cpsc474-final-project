@@ -205,10 +205,10 @@ class Game:
 
     # TERMINAL
     def is_game_over(self):
-        return self.terminal_helper[0]
+        return self.terminal_helper()[0]
 
     def payoff(self):
-        return self.terminal_helper[1]
+        return self.terminal_helper()[1]
 
     def play(self, p1_policy, p2_policy, log):
         while not self.is_game_over():
@@ -225,6 +225,7 @@ class Game:
                 action = max(actions, key=lambda x: x[3])
                 self.execute_action(self.p1, self.p2, action)
             else:
+
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
                 opponent_left_hand, opponent_right_hand = self.p1.left_hand(), self.p1.right_hand()
 
@@ -232,8 +233,10 @@ class Game:
                 attack_action = p2_policy.attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 divide_action = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
+                # print("actions: ", actions)
                 random.shuffle(actions)
                 action = max(actions, key=lambda x: x[3])
+                # print("chosen action: ", action)
                 self.execute_action(self.p2, self.p1, action)
 
             # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
