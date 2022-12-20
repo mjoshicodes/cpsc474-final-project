@@ -42,6 +42,9 @@ class Game:
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
 
+    def get_turn(self):
+        return self._turn
+
     def update_turn(self, turn):
         self._turn = turn
 
@@ -50,6 +53,9 @@ class Game:
             self.update_turn(P2)
         else:
             self.update_turn(P1)
+
+    def __str__(self):
+        return f"({self.p1.left_hand(), self.p1.left_deaths(), self.p1.right_hand(), self.p1.right_deaths(), self.p2.left_hand(), self.p2.right_hand(), self.p2.left_deaths(), self.p2.right_deaths(), self._turn}"
 
     def make_copy(self):
         new_game = Game()
@@ -61,7 +67,7 @@ class Game:
         new_game.p1.update_right_deaths(self.p1.right_deaths())
         new_game.p2.update_left_deaths(self.p1.left_deaths())
         new_game.p2.update_right_deaths(self.p2.right_deaths())
-        new_game.update_turn(self._turn)
+        new_game.update_turn(self.get_turn())
         return new_game
 
     def actor(self):
@@ -143,16 +149,15 @@ class Game:
         next_position = self.make_copy()
         if action_type == "SPLIT":
             new_left_hand_value, new_right_hand_value = action[1], action[2]
-            if self._turn == P1:
+            if next_position._turn == P1:
                 next_position.p1.update_left_hand(new_left_hand_value)
                 next_position.p1.update_right_hand(new_right_hand_value)
-                next_position.next_turn()
             else:
                 next_position.p2.update_left_hand(new_left_hand_value)
                 next_position.p2.update_right_hand(new_right_hand_value)
         elif action_type == "ATTACK":
             attack_value, attacked_hand_idx = action[1], action[2]
-            if self._turn == P1:
+            if next_position._turn == P1:
                 if attacked_hand_idx == Left:
                     new_sum = (next_position.p2.left_hand() + attack_value) % 5
                     if new_sum == 0:
@@ -176,7 +181,7 @@ class Game:
                     next_position.p1.update_right_hand(new_sum)
         else:
             new_left_hand_value, new_right_hand_value = action[1], action[2]
-            if self._turn == P1:
+            if next_position._turn == P1:
                 next_position.p1.update_left_hand(new_left_hand_value)
                 next_position.p1.update_right_hand(new_right_hand_value)
             else:
