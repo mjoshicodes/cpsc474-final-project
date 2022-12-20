@@ -94,7 +94,6 @@ if __name__ == '__main__':
     parser.add_argument('--time', dest='time', type=float, action="store", default=0.1, help='time for MCTS per move')
     parser.add_argument('--depth', dest='depth', type=int, action='store', default=2, help='depth of minimax search to compare MCTS to (default=2)')
     parser.add_argument('--random', dest="p_random", type=float, action="store", default = 0.0, help="p(random instead of minimax) (default=0.0)")
-    parser.add_argument('--game', dest="game", choices=["kalah", "pegging"], default="pegging", help="game to play")
     args = parser.parse_args()
 
     try:
