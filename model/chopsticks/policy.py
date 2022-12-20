@@ -175,6 +175,27 @@ class GreedyDivider(DividePolicy):
         new_left_hand, new_right_hand, reward = resulting_hand_values
         return ("DIVIDE", new_left_hand, new_right_hand, reward)
 
+
+class MyPolicy(ChopsticksPolicy):
+    def __init__(self, game):
+        super().__init__(game)
+        # Change one to the GreedyThrower and change one for GreedyPegger and make your c
+        self._policy = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
+        
+    def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        return self._policy.split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+
+
+    def attack (self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        # Prioritize playing cards that cannot make a 15 in the beginning
+        # Can build on top of the greedy algorithm for this one
+        return self._policy.attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+
+    def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        # Prioritize playing cards that cannot make a 15 in the beginning
+        # Can build on top of the greedy algorithm for this one
+        return self._policy. divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+
 class RulesSplitter(SplitPolicy):
     def __init__(self, game):
         super().__init__(game)

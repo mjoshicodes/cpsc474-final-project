@@ -13,6 +13,8 @@ def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
     if left_hand == 0 or right_hand == 0:
         return None
 
+    old_hand = (left_hand, right_hand)
+
     my_hand_sum = left_hand + right_hand
     possible_hand_values = [hand for hand in list(range(0, my_hand_sum)) if hand < 5]
 
@@ -21,15 +23,19 @@ def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
     if len(split_combinations) == 0:
             return None
 
-    def score(split):
+    def score(old_hand, split):
+        old_left_hand, old_right_hand = old_hand
         left_hand, right_hand = split
+        reward = 0 
 
-        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5:
-            return left_hand, right_hand, -1
-        else:
-            return left_hand, right_hand, 1
+        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
+            reward += 1
+        elif old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
+            reward -= 1
+        return (left_hand, right_hand, reward)
+        
 
-    return max(map(lambda split: score(split), split_combinations), key=lambda t: t[2])
+    return max(map(lambda split: score(old_hand, split), split_combinations), key=lambda t: t[2])
 
 def get_valid_attacks(left_hand, right_hand):
     valid_attacks = []
@@ -75,22 +81,27 @@ def greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_ha
 
     my_hand_sum = left_hand + right_hand
     possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)))
-
+    
+    old_hand = (left_hand, right_hand)
     combos = list(combinations_with_replacement(possible_hand_values, 2))
     divide_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
 
     if len(divide_combinations) == 0:
         return None
 
-    def score(divide):
-        left_hand, right_hand = divide
+    def score(old_hand, split):
+        old_left_hand, old_right_hand = old_hand
+        left_hand, right_hand = split
+        reward = 0 
 
-        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5:
-            return left_hand, right_hand, -1
-        else:
-            return left_hand, right_hand, 1
+        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
+            reward += 1
+        elif old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
+            reward -= 1
+        return (left_hand, right_hand, reward)
 
-    return max(map(lambda divide: score(divide), divide_combinations), key=lambda t: t[2])
+
+    return max(map(lambda divide: score(old_hand, divide), divide_combinations), key=lambda t: t[2])
 
 
 def does_attack_kill_hand(attack_value, opponent):
