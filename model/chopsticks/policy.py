@@ -184,7 +184,7 @@ class MyPolicy(ChopsticksPolicy):
     def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         # Prioritize playing cards that cannot make a 15 in the beginning
         # Can build on top of the greedy algorithm for this one
-        return self._policy. divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        return self._policy.divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
 class RulesSplitter(SplitPolicy):
     def __init__(self, game):
