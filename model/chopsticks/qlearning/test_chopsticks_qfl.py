@@ -21,7 +21,7 @@ if __name__ == "__main__":
     start = time.time()
     policy = chopsticks_qfl.q_learn(model, limit)
     t = time.time() - start
-    if t > limit:
-        print("WARNING: Q-learning ran for", t, "seconds; allowed", limit)
+    # if t > limit:
+    #     print("WARNING: Q-learning ran for", t, "seconds; allowed", limit)
     
-    print(model.simulate(policy, n))
+    print("Q-learning model beats a random agent at a ratio of", model.simulate(policy, n))
