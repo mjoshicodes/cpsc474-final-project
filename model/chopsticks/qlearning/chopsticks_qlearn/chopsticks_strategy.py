@@ -49,12 +49,16 @@ class ChopsticksStrategy:
             pos -- a tuple (field_pos, downs_left, distance, time_in_ticks)
             offensive_play -- the index of an offensive play
         '''
-
+        print("p1_index", p1_index)
         p1_actions = self.get_all_moves(self._game.p1)
         p1_play = p1_actions[p1_index]
 
+        # print("chose to play action", p1_play)
+
         # execute p1 move
         self._game.execute_action(self._game.p1, self._game.p2, p1_play)
+
+        # print("result after p1 action", self._game.return_position())
 
         # choose random p2 move
         p2_actions = self.get_all_moves(self._game.p2)
@@ -64,8 +68,9 @@ class ChopsticksStrategy:
             p2_random_action = random.randint(0, p2_size)
             p2_play = p2_actions[p2_random_action]
             #play p2
+            # print("P2 chose to play action", p2_play)
             self._game.execute_action(self._game.p2, self._game.p1, p2_play)
-
+            # print("result after p2 action", self._game.return_position())
         # return the position of the game
         return self._game.return_position()
     

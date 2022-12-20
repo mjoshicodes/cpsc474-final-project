@@ -2,11 +2,12 @@ import random
 import sys
 import minimax as minimax
 import mcts
-import kalah
+# import kalah
 from argparse import ArgumentParser
+from chopsticks import Game
 
-from kalah import Kalah
-from peg_game import PeggingGame
+# from kalah import Kalah
+# from peg_game import PeggingGame
 
 class MCTSTestError(Exception):
     pass
@@ -26,10 +27,10 @@ def compare_policies(game, p1, p2, games, prob):
         # start with fresh copies of the policy functions
         p1_policy = p1()
         p2_policy = p2()
-        position = game.initial_state()
+        position = game
         copy = position
         
-        while not position.is_terminal():
+        while not position.is_game_over():
             if random.random() < prob:
                 if position.actor() == i % 2:
                     move = p1_policy(position)
@@ -106,8 +107,8 @@ if __name__ == '__main__':
         if args.time <= 0:
             raise MCTSTestError("time must be positive")
 
-        game = PeggingGame(4) if args.game == "pegging" else Kalah(6, 4)
-        h = (lambda pos: pos.score()[0] - pos.score()[1]) if args.game == "pegging" else minimax.seeds_stored_heuristic
+        game = Game()
+        h = minimax.seeds_stored_heuristic
     
         test_game(game,
                   args.count,
