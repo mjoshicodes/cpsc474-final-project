@@ -12,6 +12,9 @@ class ChopsticksStrategy:
         '''
         self._game = Game()
     
+    def reset_game(self):
+        self._game = Game()
+    
     def get_all_actions_p1(self):
         actions = []
         moves = ['ATTACK', 'DIVIDE', 'SPLIT']
@@ -116,14 +119,17 @@ class ChopsticksStrategy:
 
             policy -- a function from game positions to offensive actions
         '''
+        # print("im simulate with n", n)
         wins = 0
         play_count = 0
         for i in range(n):
-            # pos = self.initial_position()
+            print("running game", i)
+            self.reset_game()
             while not self.game_over():
                 pos = self._game.return_position()
                 play_count += 1
                 self.result(policy(pos))
+            print(self._game.return_position())
             if self.win():
                 wins += 1
         return wins / n

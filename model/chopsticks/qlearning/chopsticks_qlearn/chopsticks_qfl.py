@@ -16,16 +16,16 @@ class QLearn:
     def choose_action(self, state):
         # find bucket for state - eps greedy method
         actions = self.model._game.get_actions_given_state(state)
-        print("CHOOSE ACTIONS FOR STATE", state, actions)
+        # print("CHOOSE ACTIONS FOR STATE", state, actions)
         best_action = 0
         p = random.random()
-        print("prob", p)
+        # print("prob", p)
         if p < self.eps:
             best_action_idx = random.randint(0, len(actions) - 1)
             best_action = actions[best_action]
         else:
             reward, best_action = self.choose_best_action(state)
-        print("BEST ACTION GIVEN", best_action)
+        # print("BEST ACTION GIVEN", best_action)
         new_state = self.model.result(best_action)
         
         return new_state, best_action
@@ -40,14 +40,14 @@ class QLearn:
             if value > max_reward:
                 best_action = action
                 max_reward = value
-        print("max reward", max_reward)
+        # print("max reward", max_reward)
         # print("best action", best_action)
         return max_reward, best_action
     
     def update(self, action, reward):
         self.Q[action] += self.alphas[action] * (reward - self.Q[action])
         self.alphas[action] *= 0.9999
-        print("updated to ", self.Q[action], "with alpha", self.alphas[action])
+        # print("updated to ", self.Q[action], "with alpha", self.alphas[action])
     
     def q_learning(self):
         time_start = time.time()
@@ -60,10 +60,10 @@ class QLearn:
                 new_state, action = self.choose_action(state)
                 # check if new_state is a terminal state
                 reward = 0
-                print("current state", state)
-                print("new state", new_state)
+                # print("current state", state)
+                # print("new state", new_state)
                 if self.model.game_over_pos(state) == True:
-                    print("new state is terminal")
+                    # print("new state is terminal")
                     reward = 1 if self.model.win_pos(new_state) else -1
                 else:
                     reward, _ = self.choose_best_action(new_state)
@@ -84,7 +84,7 @@ def q_learn(model, limit):
         # best_action = 1
         # return best_action
         _, best_action = q.choose_best_action(pos)
-        print("best action", best_action)
+        # print("best action", best_action)
         return best_action
 
     return policy
