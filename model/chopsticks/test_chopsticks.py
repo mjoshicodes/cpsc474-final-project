@@ -27,6 +27,8 @@ if __name__ == "__main__":
     #################################################################################
     # RULES BASED VS GREEDY AGENT HERE
     game = Game()
+    # benchmark = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
+
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
 
