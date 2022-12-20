@@ -48,6 +48,23 @@ class Game:
         else:
             self._turn = P1
 
+    def make_copy(self):
+        new_game = Game()
+        new_game.p1.update_left_hand(self.p1.left_hand())
+        new_game.p1.update_right_hand(self.p1.update_right_hand())
+        new_game.p2.update_left_hand(self.p2.left_hand())
+        new_game.p2.update_right_hand(self.p2.update_right_hand())
+        new_game.p1.update_left_deaths(self.p1.left_deaths())
+        new_game.p1.update_right_deaths(self.p1.right_deaths())
+        new_game.p2.update_left_deaths(self.p1.left_deaths())
+        new_game.p2.update_right_deaths(self.p2.update_right_deaths())
+        if self._turn == P2:
+            new_game.next_turn()
+        return new_game
+
+    def actor(self):
+        return self._turn
+
     def get_split_actions(self, left_hand, right_hand):
         if left_hand == 0 or right_hand == 0:
             return []
@@ -119,9 +136,55 @@ class Game:
         player.update_left_hand(new_left_hand_value)
         player.update_right_hand(new_right_hand_value)
 
+    def simulate_action(self, action):
+        action_type = action[0]
+        next_position = self.make_copy()
+        if action_type == "SPLIT":
+            new_left_hand_value, new_right_hand_value = action[1], action[2]
+            if self._turn == P1:
+                next_position.p1.update_left_hand(new_left_hand_value)
+                next_position.p1.update_right_hand(new_right_hand_value)
+                next_position.next_turn()
+            else:
+                next_position.p2.update_left_hand(new_left_hand_value)
+                next_position.p2.update_right_hand(new_right_hand_value)
+        elif action_type == "ATTACK":
+            attack_value, attacked_hand_idx = action[1], action[2]
+            if self._turn == P1:
+                if attacked_hand_idx == Left:
+                    new_sum = (next_position.p2.left_hand() + attack_value) % 5
+                    if new_sum == 0:
+                        next_position.p2.update_left_deaths(next_position.p2.left_deaths() + 1)
+                    next_position.p2.update_left_hand(new_sum)
+                else:
+                    new_sum = (next_position.p2.right_hand() + attack_value) % 5
+                    if new_sum == 0:
+                        next_position.p2.update_right_deaths(next_position.p2.right_deaths() + 1)
+                    next_position.p2.update_right_hand(new_sum)
+            else:
+                if attacked_hand_idx == Left:
+                    new_sum = (next_position.p1.left_hand() + attack_value) % 5
+                    if new_sum == 0:
+                        next_position.p1.update_left_deaths(next_position.p1.left_deaths() + 1)
+                    next_position.p1.update_left_hand(new_sum)
+                else:
+                    new_sum = (next_position.p1.right_hand() + attack_value) % 5
+                    if new_sum == 0:
+                        next_position.p1.update_right_deaths(next_position.p1.right_deaths() + 1)
+                    next_position.p1.update_right_hand(new_sum)
+        else:
+            new_left_hand_value, new_right_hand_value = action[1], action[2]
+            if self._turn == P1:
+                next_position.p1.update_left_hand(new_left_hand_value)
+                next_position.p1.update_right_hand(new_right_hand_value)
+            else:
+                next_position.p2.update_left_hand(new_left_hand_value)
+                next_position.p2.update_right_hand(new_right_hand_value)
+        next_position.next_turn()
+        return next_position
+
     def execute_action(self, myself, opponent, action):
         action_type = action[0]
-
         if action_type == "SPLIT":
             new_left_hand_value, new_right_hand_value = action[1], action[2]
             self.split(myself, new_left_hand_value, new_right_hand_value)
@@ -132,13 +195,20 @@ class Game:
             new_left_hand_value, new_right_hand_value = action[1], action[2]
             self.divide(myself, new_left_hand_value, new_right_hand_value)
 
-    def is_game_over(self):
+    def terminal_helper(self):
         if self.p1.lost():
-            return True
+            return True, -1
         elif self.p2.lost():
-            return True
+            return True, 1
         else:
-            return False
+            return False, 0
+
+    # TERMINAL
+    def is_game_over(self):
+        return self.terminal_helper[0]
+
+    def payoff(self):
+        return self.terminal_helper[1]
 
     def play(self, p1_policy, p2_policy, log):
         while not self.is_game_over():

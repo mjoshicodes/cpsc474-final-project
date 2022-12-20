@@ -64,7 +64,7 @@ def traverse(root, tree):
     path = [root]
     hit = False
     while not hit:
-        if pointer_to_visit.is_terminal():
+        if pointer_to_visit.is_game_over():
             backtrack(path, pointer_to_visit.payoff(), tree)
             return
         hit, node_to_visit = contains_node_to_visit(pointer_to_visit, tree)
@@ -74,16 +74,16 @@ def traverse(root, tree):
             pointer_to_visit = ucb(pointer_to_visit, tree)
         path.append(pointer_to_visit)
     actions = pointer_to_visit.get_actions()
-    successors = [pointer_to_visit.successor(action) for action in actions]
+    successors = [pointer_to_visit.simulate_action(action) for action in actions]
     tree[pointer_to_visit] = [0, 0, actions, successors]
     payoff = simulate(pointer_to_visit)
     backtrack(path, payoff, tree)
 
 
 def simulate(node):
-    while not node.is_terminal():
+    while not node.is_game_over():
         actions = node.get_actions()
-        node = node.successor(choice(actions))
+        node = node.simulate_action(choice(actions))
     return node.payoff()
 
 
@@ -99,7 +99,7 @@ def mcts_helper(position, duration, dictionary):
     # Establish the treev
     if not position in dictionary:
         actions = position.get_actions()
-        successors = [position.successor(action) for action in actions]
+        successors = [position.simulate_action(action) for action in actions]
         dictionary[position] = [0, 0, actions, successors]
     while time() - start_time <= duration:
         traverse(position, dictionary)
