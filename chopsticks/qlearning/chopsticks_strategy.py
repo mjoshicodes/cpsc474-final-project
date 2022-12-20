@@ -1,5 +1,6 @@
 import random
 from chopsticks import Game
+import greedy_ql
 
 class ChopsticksStrategy:
     def __init__(self):
@@ -57,7 +58,7 @@ class ChopsticksStrategy:
         p2_actions = self.get_all_moves(self._game.p2)
         p2_size = len(p2_actions) - 1
         if p2_size > 0:
-            p2_play = self.p2_greedy(p2_actions)
+            p2_play = greedy_ql.get_greedy_action(p2_actions, self._game.p2, self._game.p1)
             self._game.execute_action(self._game.p2, self._game.p1, p2_play)
         
         return self._game.return_position()
@@ -96,7 +97,7 @@ class ChopsticksStrategy:
 
         # current state space
         old_left_hand = self._game.p2.left_hand()
-        old_right_hand = self._game.p2.left_hand()
+        old_right_hand = self._game.p2.right_hand()
         opponent_left_hand = self._game.p1.left_hand()
         opponent_right_hand = self._game.p1.right_hand()
         
@@ -205,7 +206,3 @@ class ChopsticksStrategy:
             if self.win():
                 wins += 1
         return wins / n
-
-if __name__ == "__main__":
-    strategy = ChopsticksStrategy()
-    print(strategy.initial_position())
