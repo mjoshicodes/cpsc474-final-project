@@ -21,6 +21,11 @@ class ChopsticksStrategy:
     #     print(actions)
 
 
+    def get_all_moves(self, player):
+        """ Returns a list of all possible moves given the player"""
+        actions = self._game.get_actions_player(player)
+        return actions
+
     def initial_position(self):
         ''' Returns the initial position in this game as a
             (p1_left_hand, p1_right_hand, p2_left_hand, p2_right_hand) tuple.
@@ -30,16 +35,15 @@ class ChopsticksStrategy:
 
     def p1_action_size(self):
         ''' Returns the number of current player (p1) actions available in this game. '''
-
         # get game p1
-        return len(self._p1_plays)
+        return len(self.get_all_moves(self._game.p1))
 
 
     def p2_action_size(self):
         ''' Returns the number of other player (p2) actions available in this game. '''
 
         # get game p2
-        return len(self._p2_plays)
+        return len(self.get_all_moves(self._game.p2))
     
     
     def result(self, p1_play):
@@ -58,7 +62,10 @@ class ChopsticksStrategy:
         self._game.execute_action(self._game.p1, self._game.p2, p1_play)
 
         # choose random p2 move
-        p2_play = None
+        p2_actions = self.get_all_moves(self._game.p2)
+        p2_size = len(p2_actions) - 1
+        p2_random_action = random.randint(0, p2_size)
+        p2_play = p2_actions[p2_random_action]
         #play p2
         self._game.execute_action(self._game.p2, self._game.p1, p2_play)
 
