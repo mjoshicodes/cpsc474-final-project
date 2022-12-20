@@ -1,2 +1,0 @@
-#!/bin/bash
-pypy3 test_qfl.py "$@"
