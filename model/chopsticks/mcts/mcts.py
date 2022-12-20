@@ -1,5 +1,5 @@
 from time import time
-from random import choice
+from random import shuffle, choice
 from math import log
 
 
@@ -64,7 +64,7 @@ def traverse(root, tree):
     path = [root]
     hit = False
     while not hit:
-        if pointer_to_visit.is_terminal():
+        if pointer_to_visit.is_game_over():
             backtrack(path, pointer_to_visit.payoff(), tree)
             return
         hit, node_to_visit = contains_node_to_visit(pointer_to_visit, tree)
@@ -74,16 +74,17 @@ def traverse(root, tree):
             pointer_to_visit = ucb(pointer_to_visit, tree)
         path.append(pointer_to_visit)
     actions = pointer_to_visit.get_actions()
-    successors = [pointer_to_visit.successor(action) for action in actions]
+    shuffle(actions)
+    successors = [pointer_to_visit.simulate_action(action) for action in actions]
     tree[pointer_to_visit] = [0, 0, actions, successors]
     payoff = simulate(pointer_to_visit)
     backtrack(path, payoff, tree)
 
 
 def simulate(node):
-    while not node.is_terminal():
+    while not node.is_game_over():
         actions = node.get_actions()
-        node = node.successor(choice(actions))
+        node = node.simulate_action(choice(actions))
     return node.payoff()
 
 
@@ -93,22 +94,21 @@ def backtrack(path, payoff, tree):
         tree[node][1] += 1
 
 
-def mcts_helper(position, duration, dictionary):
-    # Get current time
+def mcts_helper(position, duration, tree):
     start_time = time()
-    # Establish the treev
-    if not position in dictionary:
+    if position not in tree:
         actions = position.get_actions()
-        successors = [position.successor(action) for action in actions]
-        dictionary[position] = [0, 0, actions, successors]
+        shuffle(actions)
+        successors = [position.simulate_action(action) for action in actions]
+        tree[position] = [0, 0, actions, successors]
     while time() - start_time <= duration:
-        traverse(position, dictionary)
+        traverse(position, tree)
     optimal_action = None
     optimal_value = float("-inf") if position.actor() == 1 else float("inf")
-    for i, action in enumerate(dictionary[position][2]):
-        state = dictionary[position][3][i]
-        if state in dictionary:
-            root_exploit_value = exploit_value(dictionary, state)
+    for i, action in enumerate(tree[position][2]):
+        state = tree[position][3][i]
+        if state in tree:
+            root_exploit_value = exploit_value(tree, state)
             if (
                 (position.actor() == 1 and root_exploit_value > optimal_value) or
                 (position.actor() == 2 and root_exploit_value < optimal_value)
@@ -116,7 +116,3 @@ def mcts_helper(position, duration, dictionary):
                 optimal_value = root_exploit_value
                 optimal_action = action
     return optimal_action
-
-# UCB 2
-# Edge dictionary: Key is edge,
-# next node to visit,

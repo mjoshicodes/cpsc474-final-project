@@ -3,6 +3,11 @@ from action_combinations import get_split_combinations, get_divide_combinations
 from hand import Hands
 import random
 
+
+'''
+Adjusted reward to be negative 1 for if one of your old hands avoided death
+the logic makes no sense lol
+'''
 P1 = 1
 P2 = 2
 
@@ -13,55 +18,57 @@ Right = 2
 def rules_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
     if left_hand == 0 or right_hand == 0:
         return None
-
-    # my_hand_sum = left_hand + right_hand
-    # possible_hand_values = [hand for hand in list(range(0, my_hand_sum)) if hand < 5]
-
-    # combos = list(combinations_with_replacement(possible_hand_values, 2))
-    # split_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
-
+    old_hand = (left_hand, right_hand)
     split_combinations = get_split_combinations(left_hand, right_hand)
 
     if len(split_combinations) == 0:
         return None
 
-    def score(split):
+
+    def score(old_hand, split):
+        old_left_hand, old_right_hand = old_hand
         left_hand, right_hand = split
-        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5:
-            return (left_hand, right_hand, -1)
-        else:
-            return (left_hand, right_hand, 1)
+        reward = 0 
+        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
+            reward -= 1
+        
+        if old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
+            reward -= 1
+        '''
+        Beginning of game heuristics:
+        this currently messes with the game
+        '''
+        # if (opponent_left_hand == 1 and opponent_right_hand == 1):
+        #     if (old_left_hand == 1 and old_right_hand == 2) or (old_left_hand == 2 and old_right_hand == 1):
+        #         if (left_hand == 3 and right_hand == 0) or (left_hand == 0 and right_hand == 3):
+        #             reward += 1
+            # if (old_left_hand == 4 and old_right_hand == 0) or (old_left_hand == 0 and old_right_hand == 4):
+            #     if (left_hand == 3 and right_hand == 1) or (left_hand == 1 and right_hand == 3):
+            #         reward += 1
 
-    # all_actions = map(lambda split: score(split), split_combinations)
-    # return max(map(lambda split: score(split), split_combinations), key=lambda t: t[2])
+
+        '''
+        From 2,2 against 1,0,--> Split to 3,1. Opponent will have tap 1 hand 
+
+        '''
+        
+        if (opponent_left_hand == 0 and opponent_right_hand == 1) or (opponent_left_hand == 1 and opponent_right_hand == 0):
+            if (old_left_hand == 2 and old_right_hand == 2):
+                if (left_hand == 3 and right_hand == 1) or (left_hand == 1 and right_hand == 3):
+                    reward += 1
+        #             # this is a good move 
+        #     '''
+        #     From 2,1 against 1,0, (your opponent's turn) is one of the easiest wins in the game. Your opponent will tap one of your hands leaving you with 2,1. Split to 3,0, your opponent will be forced to tap your 3 leaving you with 4,0. Finally, you tap their hand to win the game.
+        #     '''
+            if (old_left_hand == 2 and old_right_hand == 1) or (old_left_hand == 1 and old_right_hand == 2):
+                if (left_hand == 3 and right_hand == 0) or (left_hand == 0 and right_hand == 3):
+                    reward += 5
+                    # this is an instawin because they have to hit your hand --> you have a hand of 4, they have a hand of 1
 
 
-    left_hand, right_hand, best_score = max(map(lambda split: score(split), split_combinations), key = lambda t: t[2])
-    # print("left_hand", left_hand)
+        return (left_hand, right_hand, reward)
+    left_hand, right_hand, best_score = max(map(lambda split: score(old_hand, split), split_combinations), key = lambda t: t[2])
     return (left_hand, right_hand, best_score)
-    # best_score = float('-inf')
-    # best_index = None
-    # for index, split_score in enumerate(all_scores):
-    #     if split_score > best_score:
-    #         best_score = split_score
-    #         best_index = index
-    # new_left_hand, new_right_hand = all_scores[best_index]
-    # return (new_left_hand, new_right_hand, best_score)
-
-
-
-    # best_action, best_score = all_actions[0], float('-inf')
-    # for action in all_actions:
-    #     new_left_hand, new_right_hand, action_score = action
-
-    #     if (left_hand == 0 or right_hand == 0) and (new_left_hand != 0 and new_right_hand != 0):
-    #         action_score += 0.5
-
-    #     if action_score > best_score:
-    #         best_action = (new_left_hand, new_right_hand, action_score)
-    #         best_score = action_score
-
-    # return best_action
 
 
 def get_valid_attacks(left_hand, right_hand):
@@ -100,60 +107,40 @@ def rules_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
             return attack_value, attacked_hand_idx, 0
 
     all_actions = list(map(lambda attack: score(attack), attack_combinations))
+    best_attack_value, best_attacked_hand_idx, best_score = max(map(lambda attack: score(attack), attack_combinations), key = lambda t: t[2])
 
-    best_action, best_score = all_actions[0], float('-inf')
-    for action in all_actions:
-        attack_value, attacked_hand_idx, action_score = action
-
-        # if does_attack_kill_hand(attack_value, opponent_left_hand, opponent_right_hand):
-        #     action_score += 1.0
-        # else:
-        #     action_score -= 1.0
-
-        if action_score > best_score:
-            best_action = (attack_value, attacked_hand_idx, action_score)
-            best_score = action_score
-
-    return best_action
+    return (best_attack_value, best_attacked_hand_idx, best_score)
 
 
 def rules_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
     if left_hand == 0 or right_hand == 0:
         return None
-
-    # my_hand_sum = left_hand + right_hand
-    # possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)))
-
-    # combos = list(combinations_with_replacement(possible_hand_values, 2))
-    # divide_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
+    old_hand = (left_hand, right_hand)
 
     divide_combinations = get_divide_combinations(left_hand, right_hand)
 
     if len(divide_combinations) == 0:
         return None
 
-    def score(divide):
+    def score(old_hand, divide):
+        old_left_hand, old_right_hand = old_hand
         left_hand, right_hand = divide
+        reward = 0 
+        if (left_hand + opponent_left_hand == 5) or (left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5):
+            reward -= 1
+        if (old_left_hand + opponent_left_hand == 5) or (old_left_hand + opponent_right_hand == 5) or (old_right_hand + opponent_left_hand == 5) or (old_right_hand + opponent_right_hand == 5):
+            reward -= 1
 
-        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5:
-            return (left_hand, right_hand, -1)
-        else:
-            return (left_hand, right_hand, 1)
-
-    all_actions = list(map(lambda divide: score(divide), divide_combinations))
-
-    best_action, best_score = all_actions[0], float('-inf')
-
-    for action in all_actions:
-        new_left_hand, new_right_hand, action_score = action
-        action_score += 1.0
-
-        if action_score > best_score:
-            best_action = (new_left_hand, new_right_hand, action_score)
-            best_score = action_score
-
-
-    return best_action
+        '''
+        From (3),(0) against (1,0) and it is your turn, it is ideal to split to (2,1)
+        '''
+        # if (opponent_left_hand == 1 and opponent_right_hand == 0) or (opponent_left_hand == 0 and opponent_right_hand == 1):
+        #     if (old_left_hand == 3 and old_right_hand == 0) or (old_left_hand == 0 and old_right_hand == 3):
+        #         if (left_hand == 1 and right_hand == 2) or (left_hand == 2 and right_hand == 1):
+        #             reward += 1
+        return (left_hand, right_hand, reward)
+    left_hand, right_hand, best_score = max(map(lambda divide: score(old_hand, divide), divide_combinations), key = lambda t: t[2])
+    return (left_hand, right_hand, best_score)
 
 def does_attack_kill_hand(attack_value, left_hand, right_hand):
     if left_hand != 0 and attack_value + right_hand == 5:

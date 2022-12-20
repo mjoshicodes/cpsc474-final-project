@@ -19,7 +19,7 @@ class Heuristic:
             pos -- a game position
         '''
         # calls on terminal positions don't count
-        if not pos.is_terminal():
+        if not pos.is_game_over():
             self.calls += 1
         return self.heuristic(pos)
 
@@ -38,7 +38,7 @@ def seeds_stored_heuristic(pos):
 
         pos -- a Kalah position
     '''
-    if pos.is_terminal():
+    if pos.is_game_over():
         value = pos.payoff() * (pos._seeds_stored(0) + pos._seeds_stored(1))
     else:
         value =  pos._seeds_stored(0) - pos._seeds_stored(1)
@@ -69,7 +69,7 @@ def minimax(pos, depth, h):
         depth -- a nonnegative integer
         h -- a heuristic function that can be applied to pos and all its successors
     '''
-    if pos.is_terminal() or depth == 0:
+    if pos.is_game_over() or depth == 0:
         return (h.evaluate(pos), None)
     else:
         if pos.actor() == 0:
@@ -78,7 +78,7 @@ def minimax(pos, depth, h):
             best_move = None
             moves = pos.get_actions()
             for move in moves:
-                child = pos.successor(move)
+                child = pos.simulate_action(move)
                 mm, _ = minimax(child, depth - 1, h)
                 if mm > best_value:
                     best_value = mm
@@ -90,7 +90,7 @@ def minimax(pos, depth, h):
             best_move = None
             moves = pos.get_actions()
             for move in moves:
-                child = pos.successor(move)
+                child = pos.simulate_action(move)
                 mm, _ = minimax(child, depth - 1, h)
                 if mm < best_value:
                     best_value = mm
