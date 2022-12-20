@@ -92,10 +92,10 @@ def rules_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
     for action in all_actions:
         attack_value, attacked_hand_idx, action_score = action
 
-        if does_attack_kill_hand(attack_value, opponent_left_hand, opponent_right_hand):
-            action_score += 1.0
-        else:
-            action_score -= 1.0
+        # if does_attack_kill_hand(attack_value, opponent_left_hand, opponent_right_hand):
+        #     action_score += 1.0
+        # else:
+        #     action_score -= 1.0
 
         if action_score > best_score:
             best_action = (attack_value, attacked_hand_idx, action_score)
