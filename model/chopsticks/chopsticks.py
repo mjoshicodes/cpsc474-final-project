@@ -67,7 +67,7 @@ class Game:
         if left_hand == 0 or right_hand == 0:
             return []
         my_hand_sum = left_hand + right_hand
-        possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)))
+        possible_hand_values = list(range(1, max(left_hand, right_hand)))
         combos = list(combinations_with_replacement(possible_hand_values, 2))
         divide_combinations = [("DIVIDE", l, r) for l, r in combos if sum([l + r]) == my_hand_sum and ((l, r) != (left_hand, right_hand) and (l, r) != (right_hand, left_hand))]
         return divide_combinations
