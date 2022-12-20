@@ -12,7 +12,6 @@ class Position:
 
 def mcts_policy(time):
     tree = {}
-
     def mcts_function(position):
         move = mcts_helper(position, time, tree)
         return move

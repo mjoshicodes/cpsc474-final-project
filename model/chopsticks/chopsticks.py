@@ -16,14 +16,20 @@ Right = 2
 
 
 class Game:
+
     def __init__(self):
-        self.p1 = Hands(1, 1)
-        self.p2 = Hands(1, 1)
+        self.reset_game()
+        self._turn = P1
 
     def reset_game(self):
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
 
+    def next_turn(self):
+        if self._turn == P1:
+            self._turn = P2
+        else:
+            self._turn = P1
 
     def get_actions(self):
         """
@@ -97,10 +103,8 @@ class Game:
             return False
 
     def play(self, p1_policy, p2_policy, log):
-        turn = 0
-
         while not self.is_game_over():
-            if turn % 2 == 0:
+            if self._turn == P1:
                 left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
                 opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
 
@@ -128,7 +132,7 @@ class Game:
 
             # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
 
-            turn += 1
+            self.next_turn()
 
         if self.p1.lost():
             self.reset_game()
