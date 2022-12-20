@@ -205,7 +205,3 @@ class ChopsticksStrategy:
             if self.win():
                 wins += 1
         return wins / n
-
-if __name__ == "__main__":
-    strategy = ChopsticksStrategy()
-    print(strategy.initial_position())
