@@ -23,8 +23,33 @@ class Game:
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
     
-    def get_all_actions(self, player):
-        pass
+    def get_actions_player(self, player):
+        """
+            Gets all the actions that the next player is able to perform.
+            Returns:
+                actions:    dictionary consisting of three keys: "attack", "divide", and "split",
+                            each holding an array of actions for that respective type of move.
+        """
+        actions = {}
+        left_hand = 0
+        right_hand = 0
+        opponent_left_hand = 0
+        opponent_right_hand = 0
+        if player == self.p1:
+            left_hand = self.p1.left_hand()
+            right_hand = self.p1.right_hand()
+            opponent_left_hand = self.p2.left_hand()
+            opponent_right_hand = self.p2.right_hand()
+        else:
+            left_hand = self.p2.left_hand()
+            right_hand = self.p2.right_hand()
+            opponent_left_hand = self.p1.left_hand()
+            opponent_right_hand = self.p1.right_hand()
+        # get split actions
+        actions["SPLIT"] = self.get_split_actions(left_hand, right_hand)
+        actions["ATTACK"] = self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        actions["DIVIDE"] = self.get_divide_actions(left_hand, right_hand)
+        return actions
 
     def get_actions(self):
         """
