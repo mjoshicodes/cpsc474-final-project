@@ -25,6 +25,8 @@ if __name__ == "__main__":
     #################################################################################
     # RANDOM VS RULE BASED HERE
     game = Game()
+    # benchmark = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
+
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
 

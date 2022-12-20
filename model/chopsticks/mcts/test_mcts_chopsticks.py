@@ -1,5 +1,5 @@
 from sys import argv
-from mcts import mcts_policy
+from mcts import MCTS
 from argparse import ArgumentParser
 from policy import CompositePolicy, RandomSplitter, RandomAttacker, RandomDivider, GreedyAttacker, GreedySplitter, GreedyDivider, RulesAttacker, RulesSplitter, RulesDivider
 from chopsticks import Game, evaluate_policies, evaluate_mcts_policies
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     # MCTS VS GREEDY AGENT HERE
     game = Game()
     benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
-    submission = mcts_policy(args.time)
+    submission = MCTS(args.time).mcts_function
 
     results = evaluate_mcts_policies(game, lambda: submission, benchmark, args.games)
     print(f"Playing chopsticks with {args.games} games")
@@ -27,7 +27,7 @@ if __name__ == "__main__":
     # MCTS VS RANDOM AGENT HERE
     game = Game()
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
-    submission = mcts_policy(args.time)
+    submission = MCTS(args.time).mcts_function
 
     results = evaluate_mcts_policies(game, lambda: submission, benchmark, args.games)
     print(f"Playing chopsticks with {args.games} games")
