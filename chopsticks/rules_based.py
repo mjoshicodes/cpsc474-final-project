@@ -1,4 +1,4 @@
-Old code
+
 from itertools import combinations, product, combinations_with_replacement
 from action_combinations import get_split_combinations, get_divide_combinations
 from hand import Hands
