@@ -94,10 +94,8 @@ def backtrack(path, payoff, tree):
 
 
 def mcts_helper(position, duration, dictionary):
-    # Get current time
     start_time = time()
-    # Establish the treev
-    if not position in dictionary:
+    if position not in dictionary:
         actions = position.get_actions()
         successors = [position.simulate_action(action) for action in actions]
         dictionary[position] = [0, 0, actions, successors]
