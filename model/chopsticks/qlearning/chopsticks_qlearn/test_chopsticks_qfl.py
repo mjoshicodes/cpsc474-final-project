@@ -3,7 +3,7 @@ import sys
 import random
 import chopsticks_strategy as chopsticks
 
-import qfl
+import chopsticks_qfl
 
 # defenses are 4-3 Blast Man-to-man, 4-3 Sam-Will Blitz, Prevent
 # outcomes are (p1_left_hand_outcome, p1_right_hand_outcome, p2_left_hand_outcome, p2_right_hand_outcome)
@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     model = chopsticks.ChopsticksStrategy()
     start = time.time()
-    policy = qfl.q_learn(model, limit)
+    policy = chopsticks_qfl.q_learn(model, limit)
     t = time.time() - start
     if t > limit:
         print("WARNING: Q-learning ran for", t, "seconds; allowed", limit)

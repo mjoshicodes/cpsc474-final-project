@@ -12,28 +12,29 @@ class QLearn:
         self.limit = limit
 
     def determine_bucket(self, new_state):
-        yts, downsLeft, ytd, timeLeft  = new_state
-        ytd_down = (ytd / downsLeft)
-        yts_time = (yts / timeLeft)
+        p1_l, p1_r, p2_l, p2_r = new_state
+        # yts, downsLeft, ytd, timeLeft  = new_state
+        # ytd_down = (ytd / downsLeft)
+        # yts_time = (yts / timeLeft)
 
         idx_0 = 0
-        idx_1 = 0
+        idx_1 = 1
 
-        if ytd_down >= 6:
-            idx_0 = 3
-        elif ytd_down >= 2.51:
-            idx_0 = 2
-        elif ytd_down >= 2.49:
-            idx_0 = 1
-        else:
-            idx_0 = 0
+        # if ytd_down >= 6:
+        #     idx_0 = 3
+        # elif ytd_down >= 2.51:
+        #     idx_0 = 2
+        # elif ytd_down >= 2.49:
+        #     idx_0 = 1
+        # else:
+        #     idx_0 = 0
         
-        if yts_time >= 3.75:
-            idx_1 = 0
-        elif yts_time >= 1.875:
-            idx_1 = 1
-        else:
-            idx_1 = 2
+        # if yts_time >= 3.75:
+        #     idx_1 = 0
+        # elif yts_time >= 1.875:
+        #     idx_1 = 1
+        # else:
+        #     idx_1 = 2
         
         return idx_0, idx_1
 
@@ -50,7 +51,7 @@ class QLearn:
             best_action = random.randint(0, 2)
         else:
             reward, best_action = self.choose_best_action(state)
-        new_state, _ = self.model.result(state, best_action)
+        new_state = self.model.result(best_action)
         
         return new_state, best_action
     
@@ -73,15 +74,15 @@ class QLearn:
             counter += 1
             # print("counter", counter)
             state = self.model.initial_position()
-            while self.model.game_over(state) == False:
+            while self.model.game_over_pos(state) == False:
                 # choose an action - greedy or epsilon
                 i, j = self.determine_bucket(state)
                 new_state, action = self.choose_action(state)
 
                 # check if new_state is a terminal state
                 reward = 0
-                if self.model.game_over(new_state) == True:
-                    reward = 1 if self.model.win(new_state) else -1
+                if self.model.game_over_pos(state) == True:
+                    reward = 1 if self.model.win_pos(new_state) else -1
                 else:
                     reward, _ = self.choose_best_action(new_state)
                 self.Q[i][j][action] += self.alphas[i][j][action] * (reward - self.Q[i][j][action])
@@ -98,10 +99,11 @@ def q_learn(model, limit):
     def policy(pos):
 
         """Returns index of selected offensive play"""
-        best_action = 1
-        return best_action
-        # _, best_action = q.choose_best_action(pos)
+        # best_action = 1
         # return best_action
+        _, best_action = q.choose_best_action(pos)
+        print("best action", best_action)
+        return best_action
 
     return policy
 
