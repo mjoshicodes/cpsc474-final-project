@@ -23,9 +23,8 @@ if __name__ == "__main__":
     print()
     #################################################################################
 
-
     #################################################################################
-    # RULES BASED VS GREEDY AGENT HERE
+    # RANDOM VS RULE BASED HERE
     game = Game()
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
@@ -33,6 +32,19 @@ if __name__ == "__main__":
     results = evaluate_policies(game, benchmark, submission, games)
     print(f"Playing chopsticks with {games} games")
     print(f"P1: Random Agent won {results[0]} percent of games")
+    print(f"P2: Rules Based Agent won {results[1]} percent of games")
+    print()
+    #################################################################################
+
+    #################################################################################
+    # RULES BASED VS GREEDY AGENT HERE
+    game = Game()
+    benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game),GreedyDivider(game))
+    submission = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
+
+    results = evaluate_policies(game, benchmark, submission, games)
+    print(f"Playing chopsticks with {games} games")
+    print(f"P1: Greedy Agent won {results[0]} percent of games")
     print(f"P2: Rules Based Agent won {results[1]} percent of games")
     print()
     #################################################################################
