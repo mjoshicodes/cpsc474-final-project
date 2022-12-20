@@ -79,7 +79,6 @@ class Game:
                 actions:    dictionary consisting of three keys: "attack", "divide", and "split",
                             each holding an array of actions for that respective type of move.
         """
-        actions = {}
         left_hand = 0
         right_hand = 0
         opponent_left_hand = 0
@@ -94,10 +93,7 @@ class Game:
             right_hand = self.p2.right_hand()
             opponent_left_hand = self.p1.left_hand()
             opponent_right_hand = self.p1.right_hand()
-        actions["SPLIT"] = self.get_split_actions(left_hand, right_hand)
-        ## Attack Value, and Hand we are attacking
-        actions["ATTACK"] = self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
-        actions["DIVIDE"] = self.get_divide_actions(left_hand, right_hand)
+        actions = self.get_split_actions(left_hand, right_hand) + self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand) + self.get_divide_actions(left_hand, right_hand)
         return actions
 
     def transfer(self, player_idx, tranfer_hand, transfer_value):
