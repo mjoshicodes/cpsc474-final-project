@@ -94,10 +94,8 @@ def greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_ha
 
 
 def does_attack_kill_hand(attack_value, opponent):
-    if opponent.left_hand() != 0:
-        if attack_value + opponent.left_hand == 5:
-            return True
-
-    if opponent.right_hand() != 0:
-        if attack_value + opponent.right_hand == 5:
-            return True
+    if opponent.left_hand() != 0 and attack_value + opponent.left_hand == 5:
+        return True
+    if opponent.right_hand() != 0 and attack_value + opponent.right_hand == 5:
+        return True
+    return False

@@ -141,12 +141,9 @@ def rules_division(left_hand, right_hand, opponent_left_hand, opponent_right_han
 
     return best_action
 
-
-def does_attack_kill_hand(attack_value, opponent_left_hand, opponent_right_hand):
-    if opponent_left_hand != 0:
-        if attack_value + opponent_left_hand == 5:
-            return True
-
-    if opponent_right_hand != 0:
-        if attack_value + opponent_right_hand == 5:
-            return True
+def does_attack_kill_hand(attack_value, opponent):
+    if opponent.left_hand() != 0 and attack_value + opponent.left_hand == 5:
+        return True
+    if opponent.right_hand() != 0 and attack_value + opponent.right_hand == 5:
+        return True
+    return False

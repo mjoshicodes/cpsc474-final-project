@@ -8,6 +8,10 @@ class Position:
     def __init__(self, p1_hands, p2_hands, actor) -> None:
         self._p1_hands = p1_hands
         self._p2_hands = p2_hands
+        self._actor = actor
+
+    def actor(self):
+        return self._actor
 
 
 def mcts_policy(time):
@@ -31,11 +35,11 @@ def explore_value(tree, node, successor):
 def ucb(node, tree):
     successors = tree[node][3]
     optimal_node = None
-    optimal_value = float("-inf") if node.actor() == 0 else float("inf")
+    optimal_value = float("-inf") if node.actor() == 1 else float("inf")
     for node_successor in successors:
         node_exploit_value = exploit_value(tree, node_successor)
         node_explore_value = explore_value(tree, node, node_successor)
-        if node.actor() == 0:
+        if node.actor() == 1:
             current_ucb = node_exploit_value + node_explore_value
             if current_ucb > optimal_value:
                 optimal_value = current_ucb
@@ -100,14 +104,14 @@ def mcts_helper(position, duration, dictionary):
     while time() - start_time <= duration:
         traverse(position, dictionary)
     optimal_action = None
-    optimal_value = float("-inf") if position.actor() == 0 else float("inf")
+    optimal_value = float("-inf") if position.actor() == 1 else float("inf")
     for i, action in enumerate(dictionary[position][2]):
         state = dictionary[position][3][i]
         if state in dictionary:
             root_exploit_value = exploit_value(dictionary, state)
             if (
-                (position.actor() == 0 and root_exploit_value > optimal_value) or
-                (position.actor() == 1 and root_exploit_value < optimal_value)
+                (position.actor() == 1 and root_exploit_value > optimal_value) or
+                (position.actor() == 2 and root_exploit_value < optimal_value)
             ):
                 optimal_value = root_exploit_value
                 optimal_action = action

@@ -3,6 +3,7 @@ import sys
 
 from enum import Enum
 from hand import Hands
+from itertools import combinations, product, combinations_with_replacement
 
 import random
 
@@ -14,6 +15,21 @@ P2 = 2
 Left = 1
 Right = 2
 
+def get_valid_attacks(left_hand, right_hand):
+    valid_attacks = []
+    if left_hand != 0:
+        valid_attacks.append(left_hand)
+    if right_hand != 0:
+        valid_attacks.append(right_hand)
+    return valid_attacks
+
+def get_hands_available_for_attack(left_hand, right_hand):
+    valid_hands = []
+    if left_hand != 0:
+        valid_hands.append(1)
+    if right_hand != 0:
+        valid_hands.append(2)
+    return valid_hands
 
 class Game:
 
@@ -31,6 +47,30 @@ class Game:
         else:
             self._turn = P1
 
+    def get_split_actions(self, left_hand, right_hand):
+        if left_hand == 0 or right_hand == 0:
+            return []
+        hand_sum = left_hand + right_hand
+        possible_hand_values = [hand for hand in list(range(0, hand_sum)) if hand < 5]
+        combos = list(combinations_with_replacement(possible_hand_values, 2))
+        split_combinations = [combo for combo in combos if sum(combo) == hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
+        return split_combinations
+
+    def get_attack_actions(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
+        possible_attacks = get_valid_attacks(left_hand, right_hand)
+        hands_available_for_attack = get_hands_available_for_attack(opponent_left_hand, opponent_right_hand)
+        attack_combinations = list(product(possible_attacks, hands_available_for_attack))
+        return attack_combinations
+
+    def get_divide_actions(self, left_hand, right_hand):
+        if left_hand == 0 or right_hand == 0:
+            return []
+        my_hand_sum = left_hand + right_hand
+        possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)))
+        combos = list(combinations_with_replacement(possible_hand_values, 2))
+        divide_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
+        return divide_combinations
+
     def get_actions(self):
         """
             Gets all the actions that the next player is able to perform.
@@ -38,26 +78,25 @@ class Game:
                 actions:    dictionary consisting of three keys: "attack", "divide", and "split",
                             each holding an array of actions for that respective type of move.
         """
-        actions, p1_hands, p2_hands = {}, [], []
-        if not self.p1.left_deaths() == 3:
-            p1_hands.append((self.p1.left_hand(),  Left))
-        if not self.p1.right_deaths() == 3:
-            p1_hands.append((self.p1.right_hand(), Right))
-        if not self.p2.left_deaths() == 3:
-            p2_hands.append((self.p2.left_hand(), Left))
-        if not self.p2.right_deaths() == 3:
-            p2_hands.append((self.p2.right_hand(), Right))
-        attack_actions = []
-        split_actions = []
-        divide_actions = []
-        if self.turn == P1:
-            for hand in p1_hands:
-                for attackable_hand in p2_hands:
-                    attack_actions.append((P2, attackable_hand[1]))
+        actions = {}
+        left_hand = 0
+        right_hand = 0
+        opponent_left_hand = 0
+        opponent_right_hand = 0
+        if self._turn == P1:
+            left_hand = self.p1.left_hand()
+            right_hand = self.p1.right_hand()
+            opponent_left_hand = self.p2.left_hand()
+            opponent_right_hand = self.p2.right_hand()
         else:
-            for hand in p2_hands:
-                pass
-        actions["attack"] = attack_actions
+            left_hand = self.p2.left_hand()
+            right_hand = self.p2.right_hand()
+            opponent_left_hand = self.p1.left_hand()
+            opponent_right_hand = self.p1.right_hand()
+        # get split actions
+        actions["SPLIT"] = self.get_split_actions(left_hand, right_hand)
+        actions["ATTACK"] = self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
+        actions["DIVIDE"] = self.get_divide_actions(left_hand, right_hand)
         return actions
 
     def transfer(self, player_idx, tranfer_hand, transfer_value):
