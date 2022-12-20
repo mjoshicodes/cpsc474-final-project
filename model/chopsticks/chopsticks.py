@@ -4,6 +4,7 @@ import sys
 from enum import Enum
 from hand import Hands
 from itertools import combinations, product, combinations_with_replacement
+from action_combinations import get_split_combinations, get_divide_combinations
 
 import random
 
@@ -51,7 +52,7 @@ class Game:
         if left_hand == 0 or right_hand == 0:
             return []
         hand_sum = left_hand + right_hand
-        possible_hand_values = [hand for hand in list(range(0, hand_sum)) if hand < 5]
+        possible_hand_values = [hand for hand in list(range(0, hand_sum + 1)) if hand < 5]
         combos = list(combinations_with_replacement(possible_hand_values, 2))
         split_combinations = [("SPLIT", l, r) for l, r in combos if sum([l, r]) == hand_sum and ((l, r) != (left_hand, right_hand) and (l, r) != (right_hand, left_hand))]
         return split_combinations
@@ -60,11 +61,11 @@ class Game:
         possible_attacks = get_valid_attacks(left_hand, right_hand)
         hands_available_for_attack = get_hands_available_for_attack(opponent_left_hand, opponent_right_hand)
         attack_combinations = product(possible_attacks, hands_available_for_attack)
-        attack_combinations = [("ATTACK", val, hand_indx) for val, hand_indx in attack_combinations]
+        attack_combinations = list(set([("ATTACK", val, hand_indx) for val, hand_indx in attack_combinations]))
         return attack_combinations
 
     def get_divide_actions(self, left_hand, right_hand):
-        if left_hand == 0 or right_hand == 0:
+        if left_hand != 0 and right_hand != 0:
             return []
         my_hand_sum = left_hand + right_hand
         possible_hand_values = list(range(1, max(left_hand, right_hand)))
@@ -76,13 +77,13 @@ class Game:
         """
             Gets all the actions that the next player is able to perform.
             Returns:
-                actions:    dictionary consisting of three keys: "attack", "divide", and "split",
-                            each holding an array of actions for that respective type of move.
+                actions:    list of tuples with all the action types: split, attack, divide
         """
         left_hand = 0
         right_hand = 0
         opponent_left_hand = 0
         opponent_right_hand = 0
+
         if self._turn == P1:
             left_hand = self.p1.left_hand()
             right_hand = self.p1.right_hand()
@@ -93,6 +94,7 @@ class Game:
             right_hand = self.p2.right_hand()
             opponent_left_hand = self.p1.left_hand()
             opponent_right_hand = self.p1.right_hand()
+
         actions = self.get_split_actions(left_hand, right_hand) + self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand) + self.get_divide_actions(left_hand, right_hand)
         return actions
 
@@ -151,7 +153,6 @@ class Game:
                 random.shuffle(actions)
 
                 action = max(actions, key=lambda x: x[3])
-                # print(action, " I am P1")
                 self.execute_action(self.p1, self.p2, action)
             else:
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
@@ -163,7 +164,6 @@ class Game:
                 actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
                 random.shuffle(actions)
                 action = max(actions, key=lambda x: x[3])
-                # print(action, " I am P2")
                 self.execute_action(self.p2, self.p1, action)
 
             # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
@@ -187,3 +187,11 @@ def evaluate_policies(game, p1_policy, p2_policy, count):
         p2_total += results[1]
 
     return (p1_total / count, p2_total / count)
+
+
+if __name__ == '__main__':
+    """main is used for unit testing functions"""
+    game = Game()
+    game.p1 = Hands(1, 1)
+    game.p2 = Hands(1, 1)
+    print(game.get_actions())
