@@ -1,6 +1,7 @@
 import random
 from abc import ABC, abstractmethod
 from itertools import combinations, product, combinations_with_replacement
+from action_combinations import get_split_combinations, get_divide_combinations
 import greedy, rules_based
 
 
@@ -73,14 +74,7 @@ class RandomSplitter(SplitPolicy):
         if left_hand == 0 or right_hand == 0:
             return None
 
-        my_hand_sum = left_hand + right_hand
-        possible_hand_values = possible_hand_values = list(range(0, max(left_hand, right_hand)+1))
-
-        if 5 in possible_hand_values:
-            possible_hand_values.remove(5)
-
-        combos = list(combinations_with_replacement(possible_hand_values, 2))
-        split_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
+        split_combinations = get_split_combinations(left_hand, right_hand)
 
         if len(split_combinations) == 0:
             return None
@@ -114,7 +108,7 @@ class RandomAttacker(AttackPolicy):
     def attack(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         possible_attacks = self.get_valid_attacks(left_hand, right_hand)
         hands_available_for_attack = self.get_hands_available_for_attack(opponent_left_hand, opponent_right_hand)
-        attack_combinations = list(product(possible_attacks, hands_available_for_attack))
+        attack_combinations = list(set(list(product(possible_attacks, hands_available_for_attack))))
         attack_value, attacked_hand_idx = random.choice(attack_combinations)
         return ("ATTACK", attack_value, attacked_hand_idx, 0)
 
@@ -124,14 +118,10 @@ class RandomDivider(DividePolicy):
         super().__init__(game)
 
     def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-        my_hand_sum = left_hand + right_hand
-        possible_hand_values = list(range(0, max(left_hand, right_hand)+1))
+        if left_hand != 0 and right_hand != 0:
+            return None
 
-        if 5 in possible_hand_values:
-            possible_hand_values.remove(5)
-
-        combos = list(combinations_with_replacement(possible_hand_values, 2))
-        divide_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
+        divide_combinations = get_divide_combinations(left_hand, right_hand)
 
         if len(divide_combinations) == 0:
             return None
@@ -181,7 +171,7 @@ class MyPolicy(ChopsticksPolicy):
         super().__init__(game)
         # Change one to the GreedyThrower and change one for GreedyPegger and make your c
         self._policy = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
-        
+
     def split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         return self._policy.split(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand)
 
