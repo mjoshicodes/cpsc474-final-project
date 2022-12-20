@@ -4,8 +4,9 @@ import sys
 from enum import Enum
 from hand import Hands
 
-import scoring
 import random
+
+import sys
 
 P1 = 1
 P2 = 2
@@ -15,13 +16,20 @@ Right = 2
 
 
 class Game:
+
     def __init__(self):
-        self.p1 = Hands(1, 1)
-        self.p2 = Hands(1, 1)
+        self.reset_game()
+        self._turn = P1
 
     def reset_game(self):
         self.p1 = Hands(1, 1)
         self.p2 = Hands(1, 1)
+
+    def next_turn(self):
+        if self._turn == P1:
+            self._turn = P2
+        else:
+            self._turn = P1
 
     def get_actions(self):
         """
@@ -84,7 +92,7 @@ class Game:
             self.attack(opponent, attacked_hand_idx, attack_value)
         else:
             new_left_hand_value, new_right_hand_value = action[1], action[2]
-            self.divide(myself, new_right_hand_value, new_left_hand_value)
+            self.divide(myself, new_left_hand_value, new_right_hand_value)
 
     def is_game_over(self):
         if self.p1.lost():
@@ -95,10 +103,8 @@ class Game:
             return False
 
     def play(self, p1_policy, p2_policy, log):
-        turn = 0
-
         while not self.is_game_over():
-            if turn % 2 == 0:
+            if self._turn == P1:
                 left_hand, right_hand = self.p1.left_hand(), self.p1.right_hand()
                 opponent_left_hand, opponent_right_hand = self.p2.left_hand(), self.p2.right_hand()
 
@@ -109,6 +115,7 @@ class Game:
                 random.shuffle(actions)
 
                 action = max(actions, key=lambda x: x[3])
+                # print(action, " I am P1")
                 self.execute_action(self.p1, self.p2, action)
             else:
                 left_hand, right_hand = self.p2.left_hand(), self.p2.right_hand()
@@ -119,11 +126,13 @@ class Game:
                 divide_action = p2_policy.divide(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
                 actions = [action for action in [split_action, attack_action, divide_action] if action is not None]
                 random.shuffle(actions)
-
                 action = max(actions, key=lambda x: x[3])
+                # print(action, " I am P2")
                 self.execute_action(self.p2, self.p1, action)
 
-            turn += 1
+            # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
+
+            self.next_turn()
 
         if self.p1.lost():
             self.reset_game()

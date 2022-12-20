@@ -46,7 +46,6 @@ class Hands:
         new_sum = (self._left_hand + attack_sum) % 5
         if new_sum == 0:
             self._left_deaths += 1
-            # print("Left Hand Dead")
         self._left_hand = new_sum
         return True
 
@@ -56,7 +55,6 @@ class Hands:
         new_sum = (self._right_hand + attack_sum) % 5
         if new_sum == 0:
             self._right_deaths += 1
-            # print("Right Hand Dead")
         self._right_hand = new_sum
         return True
 
@@ -67,7 +65,7 @@ class Hands:
         return self._right_hand == 0
 
     def lost(self):
-        return (self.left_dead() and self.right_dead()) or (self._left_deaths == 3 and self._right_deaths == 3)
+        return (self.left_dead() and self.right_dead()) or (self._left_deaths >= 3 and self._right_deaths >= 3)
 
     def __hash__(self):
         return self._hash
