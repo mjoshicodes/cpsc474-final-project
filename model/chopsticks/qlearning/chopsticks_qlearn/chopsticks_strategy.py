@@ -11,6 +11,15 @@ class ChopsticksStrategy:
             prob -- a probability distribution over the tuples in plays[o][d]
         '''
         self._game = Game()
+    
+    def get_all_actions_p1(self):
+        actions = []
+        moves = ['ATTACK', 'DIVIDE', 'SPLIT']
+        for left_hand in range(0, 5):
+            for right_hand in range(0, 5):
+                for move in moves:
+                    actions.append((move, left_hand, right_hand))
+        return actions
 
 
     def get_all_moves(self, player):
@@ -38,7 +47,7 @@ class ChopsticksStrategy:
         return len(self.get_all_moves(self._game.p2))
     
     
-    def result(self, p1_index):
+    def result(self, p1_play):
         ''' Executes selected play and chooses a random play for p2 to execute
         
             Returns the position that results from the given offensive play
@@ -49,9 +58,7 @@ class ChopsticksStrategy:
             pos -- a tuple (field_pos, downs_left, distance, time_in_ticks)
             offensive_play -- the index of an offensive play
         '''
-        print("p1_index", p1_index)
-        p1_actions = self.get_all_moves(self._game.p1)
-        p1_play = p1_actions[p1_index]
+
 
         # print("chose to play action", p1_play)
 

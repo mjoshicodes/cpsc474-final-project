@@ -3,9 +3,11 @@ from collections import defaultdict
 import time
 
 class QLearn:
-    def __init__(self, model, limit, possible_states):
-        self.Q = [[[0 for k in range(possible_states)] for j in range(possible_states)] for i in range(possible_states)]
-        self.alphas = [[[0.25 for k in range(possible_states)] for j in range(possible_states)] for i in range(possible_states)]
+    def __init__(self, model, limit, possible_states, possible_actions):
+        self.Q = dict([(action, 0) for action in possible_actions])
+        # self.Q = [[[.1 for k in range(possible_states)] for j in range(possible_states)] for i in range(possible_states)]
+        self.alphas = dict([(action, 0.25) for action in possible_actions])
+        # self.alphas = [[[0.25 for k in range(possible_states)] for j in range(possible_states)] for i in range(possible_states)]
         self.eps = 0.2
         self.actions = possible_states
         self.model = model
@@ -13,33 +15,39 @@ class QLearn:
     
     def choose_action(self, state):
         # find bucket for state - eps greedy method
+        actions = self.model._game.get_actions_given_state(state)
+        print("CHOOSE ACTIONS FOR STATE", state, actions)
         best_action = 0
         p = random.random()
         print("prob", p)
         if p < self.eps:
-            best_action = random.randint(0, self.actions)
+            best_action_idx = random.randint(0, len(actions) - 1)
+            best_action = actions[best_action]
         else:
             reward, best_action = self.choose_best_action(state)
+        print("BEST ACTION GIVEN", best_action)
         new_state = self.model.result(best_action)
         
         return new_state, best_action
     
     def choose_best_action(self, state):
+        # choose best action
+        actions = self.model._game.get_actions_given_state(state)
         max_reward = -10
         best_action = 0
-        for action in range(self.actions):
-            value = self.Q[action][action][action]
-            print("value", value)
+        for action in actions:
+            value = self.Q[action]
             if value > max_reward:
                 best_action = action
                 max_reward = value
         print("max reward", max_reward)
+        # print("best action", best_action)
         return max_reward, best_action
     
     def update(self, action, reward):
-        self.Q[action][action][action] += self.alphas[action][action][action] * (reward - self.Q[action][action][action])
-        self.alphas[action][action][action] *= 0.9999
-        print("updated to ", self.Q[action][action][action])
+        self.Q[action] += self.alphas[action] * (reward - self.Q[action])
+        self.alphas[action] *= 0.9999
+        print("updated to ", self.Q[action], "with alpha", self.alphas[action])
     
     def q_learning(self):
         time_start = time.time()
@@ -66,7 +74,7 @@ def q_learn(model, limit):
     "Returns a function that takes a non-terminal position in the game"
 
     # Multiplying limit to deal with warning
-    q = QLearn(model, limit * .9999, model.p1_action_size())
+    q = QLearn(model, limit * .9999, model.p1_action_size(), model.get_all_actions_p1())
 
     q.q_learning()
 

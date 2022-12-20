@@ -75,6 +75,11 @@ class Game:
         combos = list(combinations_with_replacement(possible_hand_values, 2))
         divide_combinations = [("DIVIDE", l, r) for l, r in combos if sum([l + r]) == my_hand_sum and ((l, r) != (left_hand, right_hand) and (l, r) != (right_hand, left_hand))]
         return divide_combinations
+    
+    def get_actions_given_state(self, state):
+        left_hand, right_hand, opponent_left_hand, opponent_right_hand = state
+        actions = self.get_split_actions(left_hand, right_hand) + self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand) + self.get_divide_actions(left_hand, right_hand)
+        return actions
 
     def get_actions(self):
         """
