@@ -48,7 +48,7 @@ class Game:
             self._turn = P1
     
     def return_position(self):
-        return (self.p1.left_hand(), self.p2.right_hand(), self.p1.left_hand(), self.p2.right_hand())
+        return (self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
 
 
     def get_split_actions(self, left_hand, right_hand):
@@ -122,6 +122,7 @@ class Game:
             opponent_left_hand = self.p1.left_hand()
             opponent_right_hand = self.p1.right_hand()
         actions = self.get_split_actions(left_hand, right_hand) + self.get_attack_actions(left_hand, right_hand, opponent_left_hand, opponent_right_hand) + self.get_divide_actions(left_hand, right_hand)
+        print("ACTIONS", actions)
         return actions
 
     def transfer(self, player_idx, tranfer_hand, transfer_value):
