@@ -14,10 +14,7 @@ def greedy_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
         return None
 
     my_hand_sum = left_hand + right_hand
-    possible_hand_values = list(range(1, max(left_hand, right_hand)+1))
-
-    if 5 in possible_hand_values:
-        possible_hand_values.remove(5)
+    possible_hand_values = [hand for hand in list(range(0, my_hand_sum)) if hand < 5]
 
     combos = list(combinations_with_replacement(possible_hand_values, 2))
     split_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]
@@ -73,14 +70,11 @@ def greedy_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand
 
 
 def greedy_division(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
-    if left_hand != 0 or right_hand != 0:
+    if left_hand == 0 or right_hand == 0:
         return None
 
     my_hand_sum = left_hand + right_hand
-    possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)+1))
-
-    if 5 in possible_hand_values:
-        possible_hand_values.remove(5)
+    possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)))
 
     combos = list(combinations_with_replacement(possible_hand_values, 2))
     divide_combinations = [combo for combo in combos if sum(combo) == my_hand_sum and (combo != (left_hand, right_hand) and combo != (right_hand, left_hand))]

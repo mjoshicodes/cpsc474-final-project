@@ -33,7 +33,22 @@ def rules_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
             return left_hand, right_hand, 1
 
     # all_actions = map(lambda split: score(split), split_combinations)
-    return max(map(lambda split: score(split), split_combinations), key=lambda t: t[2])
+    # return max(map(lambda split: score(split), split_combinations), key=lambda t: t[2])
+
+    all_actions = list(map(lambda attack: score(attack), split_combinations))
+
+    best_action, best_score = all_actions[0], float('-inf')
+    for action in all_actions:
+        new_left_hand, new_right_hand, action_score = action
+
+        if (left_hand == 0 or right_hand == 0) and (new_left_hand != 0 and new_right_hand != 0):
+            action_score += 0.5
+
+        if action_score > best_score:
+            best_action = (new_left_hand, new_right_hand, action_score)
+            best_score = action_score
+
+    return best_action
 
 
 def get_valid_attacks(left_hand, right_hand):
@@ -76,7 +91,11 @@ def rules_attack(left_hand, right_hand, opponent_left_hand, opponent_right_hand)
     best_action, best_score = all_actions[0], float('-inf')
     for action in all_actions:
         attack_value, attacked_hand_idx, action_score = action
-        action_score -= 0.5
+
+        if does_attack_kill_hand(attack_value, opponent_left_hand, opponent_right_hand):
+            action_score += 1.0
+        else:
+            action_score -= 1.0
 
         if action_score > best_score:
             best_action = (attack_value, attacked_hand_idx, action_score)
@@ -113,21 +132,21 @@ def rules_division(left_hand, right_hand, opponent_left_hand, opponent_right_han
 
     best_action, best_score = all_actions[0], float('-inf')
     for action in all_actions:
-        left_hand, right_hand, action_score = action
+        new_left_hand, new_right_hand, action_score = action
         action_score += 1.0
 
         if action_score > best_score:
-            best_action = (left_hand, right_hand, action_score)
+            best_action = (new_left_hand, new_right_hand, action_score)
             best_score = action_score
 
     return best_action
 
 
-def does_attack_kill_hand(attack_value, opponent):
-    if opponent.left_hand() != 0:
-        if attack_value + opponent.left_hand == 5:
+def does_attack_kill_hand(attack_value, opponent_left_hand, opponent_right_hand):
+    if opponent_left_hand != 0:
+        if attack_value + opponent_left_hand == 5:
             return True
 
-    if opponent.right_hand() != 0:
-        if attack_value + opponent.right_hand == 5:
+    if opponent_right_hand != 0:
+        if attack_value + opponent_right_hand == 5:
             return True

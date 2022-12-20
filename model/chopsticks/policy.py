@@ -74,7 +74,7 @@ class RandomSplitter(SplitPolicy):
             return None
 
         my_hand_sum = left_hand + right_hand
-        possible_hand_values = possible_hand_values = list(range(1, max(left_hand, right_hand)+1))
+        possible_hand_values = possible_hand_values = list(range(0, max(left_hand, right_hand)+1))
 
         if 5 in possible_hand_values:
             possible_hand_values.remove(5)
@@ -125,7 +125,7 @@ class RandomDivider(DividePolicy):
 
     def divide(self, left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         my_hand_sum = left_hand + right_hand
-        possible_hand_values = list(range(1, max(left_hand, right_hand)+1))
+        possible_hand_values = list(range(0, max(left_hand, right_hand)+1))
 
         if 5 in possible_hand_values:
             possible_hand_values.remove(5)
