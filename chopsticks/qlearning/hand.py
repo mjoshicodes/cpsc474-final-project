@@ -28,6 +28,12 @@ class Hands:
     def update_right_hand(self, value):
         self._right_hand = value
 
+    def update_left_deaths(self, deaths):
+        self._left_deaths = deaths
+
+    def update_right_deaths(self, deaths):
+        self._right_deaths = deaths
+
     def transfer_right_to_left(self, transfer_sum):
         if self._left_deaths == 3 or self._left_hand + transfer_sum > 4:
             return "Not a legal move!"
@@ -46,7 +52,6 @@ class Hands:
         new_sum = (self._left_hand + attack_sum) % 5
         if new_sum == 0:
             self._left_deaths += 1
-            # print("Left Hand Dead")
         self._left_hand = new_sum
         return True
 
@@ -56,7 +61,6 @@ class Hands:
         new_sum = (self._right_hand + attack_sum) % 5
         if new_sum == 0:
             self._right_deaths += 1
-            # print("Right Hand Dead")
         self._right_hand = new_sum
         return True
 
@@ -67,7 +71,7 @@ class Hands:
         return self._right_hand == 0
 
     def lost(self):
-        return (self.left_dead() and self.right_dead()) or (self._left_deaths == 3 and self._right_deaths == 3)
+        return (self.left_dead() and self.right_dead()) or (self._left_deaths >= 3 and self._right_deaths >= 3)
 
     def __hash__(self):
         return self._hash

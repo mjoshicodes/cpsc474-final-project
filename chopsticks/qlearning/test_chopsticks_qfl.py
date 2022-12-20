@@ -7,7 +7,7 @@ import chopsticks_qfl
 
 if __name__ == "__main__":
     limit = 9
-    n = 250000
+    n = 25
     model = chopsticks.ChopsticksStrategy()
     start = time.time()
     policy = chopsticks_qfl.q_learn(model, limit)
