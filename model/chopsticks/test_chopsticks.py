@@ -13,7 +13,6 @@ if __name__ == "__main__":
     # GREEDY VS RANDOM AGENT HERE
     game = Game()
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
-    # benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
     submission = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
 
     results = evaluate_policies(game, benchmark, submission, games)

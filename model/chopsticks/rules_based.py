@@ -29,22 +29,21 @@ def rules_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         old_left_hand, old_right_hand = old_hand
         left_hand, right_hand = split
         reward = 0 
-        if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
+        if (left_hand + opponent_left_hand == 5) or (left_hand + opponent_right_hand == 5) or (right_hand + opponent_left_hand == 5) or (right_hand + opponent_right_hand == 5):
             reward -= 1
-        
-        if old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
+        if (old_left_hand + opponent_left_hand == 5) or (old_left_hand + opponent_right_hand == 5) or (old_right_hand + opponent_left_hand == 5) or (old_right_hand + opponent_right_hand == 5):
             reward -= 1
         '''
         Beginning of game heuristics:
         this currently messes with the game
         '''
-        # if (opponent_left_hand == 1 and opponent_right_hand == 1):
-        #     if (old_left_hand == 1 and old_right_hand == 2) or (old_left_hand == 2 and old_right_hand == 1):
-        #         if (left_hand == 3 and right_hand == 0) or (left_hand == 0 and right_hand == 3):
-        #             reward += 1
-            # if (old_left_hand == 4 and old_right_hand == 0) or (old_left_hand == 0 and old_right_hand == 4):
-            #     if (left_hand == 3 and right_hand == 1) or (left_hand == 1 and right_hand == 3):
-            #         reward += 1
+        if (opponent_left_hand == 1 and opponent_right_hand == 1):
+            if (old_left_hand == 1 and old_right_hand == 2) or (old_left_hand == 2 and old_right_hand == 1):
+                if (left_hand == 3 and right_hand == 0) or (left_hand == 0 and right_hand == 3):
+                    reward -= 1
+            if (old_left_hand == 4 and old_right_hand == 0) or (old_left_hand == 0 and old_right_hand == 4):
+                if (left_hand == 3 and right_hand == 1) or (left_hand == 1 and right_hand == 3):
+                    reward += 1
 
 
         '''
@@ -62,12 +61,15 @@ def rules_split(left_hand, right_hand, opponent_left_hand, opponent_right_hand):
         #     '''
             if (old_left_hand == 2 and old_right_hand == 1) or (old_left_hand == 1 and old_right_hand == 2):
                 if (left_hand == 3 and right_hand == 0) or (left_hand == 0 and right_hand == 3):
-                    reward += 5
+                    reward -= 5
+                    # print("check super neg reward")
                     # this is an instawin because they have to hit your hand --> you have a hand of 4, they have a hand of 1
 
 
         return (left_hand, right_hand, reward)
     left_hand, right_hand, best_score = max(map(lambda split: score(old_hand, split), split_combinations), key = lambda t: t[2])
+    # print("check:", (left_hand, right_hand, best_score))
+
     return (left_hand, right_hand, best_score)
 
 
