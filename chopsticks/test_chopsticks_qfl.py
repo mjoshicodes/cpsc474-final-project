@@ -18,7 +18,7 @@ if __name__ == "__main__":
 
     print ("TEST 1: Q-Learning against a Random Agent")
     
-    print("We are using Q-learning to play Chopsticks against a Random Strategy. Here is my winning percentage over", n, "games:", model.simulate(policy, n))
+    # print("We are using Q-learning to play Chopsticks against a Random Strategy. Here is my winning percentage over", n, "games:", model.simulate(policy, n))
 
     #################################################################################
     #   Q-LEARNING VS. GREEDY AGENT
@@ -27,6 +27,8 @@ if __name__ == "__main__":
 
     test_limit = 10
     t = time.time()
-    while t < test_limit:
-        val, n = model.simulate_greedy(policy, n)
-    print("Running against a greedy strategy, which our optimal solution, and therefore will run indefintely")
+    model.simulate_greedy(policy, n)
+    # while t < test_limit:
+    #     val, n = model.simulate_greedy(policy, n)
+    # print("val", val)
+    # print("Running against a greedy strategy, which our optimal solution, and therefore will run indefintely")
