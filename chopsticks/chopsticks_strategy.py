@@ -60,6 +60,7 @@ class ChopsticksStrategy:
         if p2_size > 0:
             p2_play = greedy_ql.get_greedy_action(p2_actions, self._game.p2, self._game.p1)
             self._game.execute_action(self._game.p2, self._game.p1, p2_play)
+
         
         return self._game.return_position()
 
@@ -196,13 +197,14 @@ class ChopsticksStrategy:
         wins = 0
         play_count = 0
         for i in range(n):
-            # print("running game", i)
+            print("running game", i)
             self.reset_game()
             while not self.game_over():
                 pos = self._game.return_position()
                 play_count += 1
                 self.greedy_result(policy(pos))
-            # print(self._game.return_position())
+
+            print(self._game.return_position())
             if self.win():
                 wins += 1
         return wins / n
