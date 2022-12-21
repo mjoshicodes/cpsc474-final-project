@@ -1,15 +1,89 @@
-Rules:
-This official set of rules is called rollover where five fingers are subtracted should a hand's sum exceeds 5 as described below.
+Group Members: Kelvin Yip (khy6), Kishan Patel (kbp27), Megha Joshi (mj573), Andy Wu (aw858)
 
+Proposal
+
+Link to video: https://www.youtube.com/watch?v=rBE9xVa_Nos
+
+Contributions:
+
+Kelvin Yip: Monte Carlo Tree Search
+Kishan Patel: Random Agent, Greedy Agent, Chopsticks Game Structure
+Megha Joshi: Q-Learning
+Andy Wu: Rules Based Heuristic
+
+Commands Necessary To Make our Results
+make
+./TestChopsticks
+
+Description of Game
+Combinatorial game
+Chopsticks is a two-player combinatorial game in which players can attack, split, or divide using finger totals. Attack allows a player to add their finger point values to another player. This can kill the opponent’s hand if that total reaches 5. Split allows a player to transfer points between their hands. However, they cannot swap the same value (e.g. (3, 2 to 1, 1)). Divide only works when a player has one hand. This allows for players to take one hand and divide it into multiple hand values.
+
+Additional Rules:
 A hand is live if it has at least one finger, and this is indicated by raising at least one finger. If a hand has zero fingers, the hand is dead, and this is indicated by raising zero fingers (i.e. a closed fist).
 If any hand of any player reaches exactly five fingers, then the hand is dead.
-Each player begins with one finger raised on each hand. After the first player turns proceed clockwise.
+Each player begins with one finger raised on each hand.
 On a player's turn, they must either attack or split. There are two types of splits, transfers and divisions.
 To attack, a player uses one of their live hands to strike an opponent's live hand. The number of fingers on the opponent's struck hand will increase by the number of fingers on the hand used to strike.
 To transfer, a player strikes their own two hands together, and transfers raised fingers from one hand to the other as desired. However, a player cannot transfer fingers to make a hand have more than 4 fingers.
 If a player has a dead hand, the player can divide the fingers between the other hand and the dead hand by transferring fingers from the other hand to the dead hand. However, players are required to attack at least once during the game.
 A player with two dead hands is eliminated from the game.
-A player wins once all opponents are eliminated.
 If you go over 5 you subtract the sum of all of the numbers by 5.
 
 ***ADDED RULE: CANT TRANFER THE DIFFERENCE IN HANDS TO THE OTHER HAND ***
+
+Greedy Agent:
+Our greedy agent takes a possible split, attack, or divide action and assigns a score to it. After returning all of the possible actions, we take the action with the best score. How we assigned
+
+Results (run with 100,000 games): From the simulations, the Greedy agent beats the Random agent ~55% of the time.
+
+
+Rule-Based Agent:
+Under the rule based agent, the heuristics we implemented were for divide and for split.
+There are a few heuristics which can improve your gameplay. However, specifically for chopsticks, there are quite a few.
+
+
+Split Heuristics:
+Beginning of game heuristics: When opponent has (1, 1)
+Another example is if you have (4, 0), you should also try to split into (3, 1) over (2, 2) as it’s been proven that this will put you into a good spot to kill them as you have a hand with higher numbers.
+When you have (4, 1), you should split into (3, 2) as this is just a more optimal play.
+
+Heuristics for when the opposing player has (1, 0) - end game
+When your opponent has only 1 finger remaining across both hands, you can play the game out correctly and ensure your win
+If you have (2, 2), you can combine into (3, 1) which is better than hitting them. This plays out better later.
+For example, if you have (2, 1), you should always combine. This forces them to hit you and you win, thus this has a large reward.
+If you have (3, 0) and (0, 3), you should split into (2, 1).
+If you have (3, 1) you should split this into (2, 2) as your opponent will have to hit you and you can split this more optimally later.
+Basically splitting whenever possible is best as opposed to splitting greedily when your opponent can kill you or you can kill your opponent.
+
+Attack Heuristics:
+There was no real heuristic for attacking besides greedily attacking and killing your opponent’s hand whenever possible.
+
+Divide Heuristics:
+When you have (3, 0) against your opponent’s (1, 0), it is better to split into (2, 1) rather than hit as it will result in an endgame where you have (1, 1) and your opponent will have just one finger. This allows you to win the game.
+
+Thus, dividing up your hand in a few scenarios will be more helpful than just greedy.
+
+Results vs Random (run with 100,000 games): From the simulations, the Rules-based agent beats the Random agent ~60% of the time.
+The rule-based agent does much better vs the random agent compared to the greedy agent.
+
+Results vs Greedy:
+Results vs Greedy (run with 100,000 games): From the simulations, the Rules-based agent beats the Random agent ~53% of the time.
+Since there are only a few tweaks in addition to the greedy algorithm, the rule-based agent does only slightly better vs the greedy agent. This is in the scenario where there are good end games or early games for the agent. The heuristics allow the agent to play optimally in certain scenarios, similar to how there are chess endgames or openings.
+
+
+MCTS Agent:
+With a limited state space for chopsticks, we were optimistic to see our MCTS agent perform against both the constructed random and greedy agents. We structured this MCTS agent via a known structure, where we pass in a position that is a Chopsticks Game object and returns the next best action to take. It traverses through the tree consisting of Game object nodes, hitting terminal positions, getting the payoff (win, loss, draw), and updates values and visits in each node.
+
+Results:
+Versus Greedy (Ran w/ 1000 games): From the simulations, MCTS agent beats the greedy agent by about 60% of the time.
+Versus Random (Ran w/ 1000 games): From the simulations, MCTS agent beats the random agent by about 80% of the time.
+
+These results should, in theory, make sense. State space is limited enough that we would have a strong amount of time to traverse and explore quite a number of nodes. In addition, instead of greedy purely looking at the next moves and returning the best, MCTS also takes into account future moves and their risks and rewards.
+
+Q-Learning Agent:
+Since the state space is limited for chopsticks, we wanted to test how Q-learning would perform without needing linear approximation. We created a chopsticks strategy that had both a random agent and a greedy agent and with the hopes that we could find a strategy that outperforms or competes indefinitely with an optimal strategy.
+
+Results: Here we see that when a Q-learning agent plays against a Random agent, the winning percentage over 250000 games is approximately ~85%.
+
+When the Q-learning agent plays against the Greedy agent, we notice that most of the time, the agent is stuck in an infinite loop. This is because at some point in the chopsticks game, an optimal strategy is the greedy strategy. We sought Professor Glenn’s advice for this situation and he explained that at any optimal strategy, a q-learning agent should be able to play forever. Our q-learning agent did play indefinitely against the greedy agent, therefore, we were able to determine that our q-learning agent was successful against both a random and greedy agent.
