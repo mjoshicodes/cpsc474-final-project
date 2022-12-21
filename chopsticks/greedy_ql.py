@@ -48,6 +48,5 @@ def get_greedy_action(actions, myself, opponent):
 
             all_actions.append(("DIVIDE", new_left_hand, new_right_hand, reward))
 
-    print("all_Actions", all_actions)
     best_action = max(all_actions, key=lambda t: t[3])
     return (best_action[0], best_action[1], best_action[2])

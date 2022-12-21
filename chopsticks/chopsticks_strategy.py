@@ -12,10 +12,10 @@ class ChopsticksStrategy:
             prob -- a probability distribution over the tuples in plays[o][d]
         '''
         self._game = Game()
-    
+
     def reset_game(self):
         self._game = Game()
-    
+
     def get_all_actions_p1(self):
         actions = []
         moves = ['ATTACK', 'DIVIDE', 'SPLIT']
@@ -49,9 +49,9 @@ class ChopsticksStrategy:
 
         # get game p2
         return len(self.get_all_moves(self._game.p2))
-    
+
     def greedy_result(self, p1_play):
-        
+
         self._game.execute_action(self._game.p1, self._game.p2, p1_play)
 
         # selecting a random valid move to p2
@@ -61,14 +61,14 @@ class ChopsticksStrategy:
             p2_play = greedy_ql.get_greedy_action(p2_actions, self._game.p2, self._game.p1)
             self._game.execute_action(self._game.p2, self._game.p1, p2_play)
 
-        
+
         return self._game.return_position()
 
-    
-    
+
+
     def result(self, p1_play):
         ''' Executes selected play and chooses a random play for p2 to execute
-        
+
             Returns the position that results from the given offensive play
             selection from the given position as a
             (field-position, downs-left, distance, ticks) tuple, and the outcome
@@ -101,7 +101,7 @@ class ChopsticksStrategy:
         old_right_hand = self._game.p2.right_hand()
         opponent_left_hand = self._game.p1.left_hand()
         opponent_right_hand = self._game.p1.right_hand()
-        
+
         for action in actions:
             move, left_hand, right_hand = action
             if move == "ATTACK":
@@ -118,7 +118,7 @@ class ChopsticksStrategy:
                     best_reward = reward
                     best_p2_move = action
             elif move == "DIVIDE":
-                reward = 0 
+                reward = 0
                 if left_hand + opponent_left_hand == 5 or left_hand + opponent_right_hand == 5 or right_hand + opponent_left_hand == 5 or right_hand + opponent_right_hand == 5:
                     reward -= 1
                 elif old_left_hand + opponent_left_hand == 5 or old_left_hand + opponent_right_hand == 5 or old_right_hand + opponent_left_hand == 5 or old_right_hand + opponent_right_hand == 5:
@@ -136,10 +136,10 @@ class ChopsticksStrategy:
                     best_reward = reward
                     best_p2_move = action
         return best_p2_move
-    
+
     def game_over(self):
         ''' Determines if the given position represents a game-over position.
-        
+
             pos -- a tuple (field_pos, down, distance, time)
         '''
         return self._game.is_game_over()
@@ -154,11 +154,11 @@ class ChopsticksStrategy:
 
     def win(self):
         ''' Determines if the given position represents a game-won position.
-        
+
             pos -- a tuple (field_pos, down, distance, time)
         '''
         return self._game.p2.lost()
-    
+
     def win_pos(self, pos):
         _, _, p2_l, p2_r = pos
         if p2_l <= 0 and p2_r <= 0:
@@ -176,17 +176,15 @@ class ChopsticksStrategy:
         wins = 0
         play_count = 0
         for i in range(n):
-            # print("running game", i)
             self.reset_game()
             while not self.game_over():
                 pos = self._game.return_position()
                 play_count += 1
                 self.result(policy(pos))
-            # print(self._game.return_position())
             if self.win():
                 wins += 1
         return wins / n
-    
+
     def simulate_greedy(self, policy, n):
         ''' Simulates games using the given policy and returns the
             winning percentage for the policy.
