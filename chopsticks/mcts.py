@@ -143,9 +143,9 @@ class MCTS():
             payoff -- The reward each node will get for searching\n
             tree -- The chopsticks tree being searched.
         """
-        for node in path:
-            tree[node][0] += payoff
-            tree[node][1] += 1
+        for position in path:
+            tree[position][0] += payoff
+            tree[position][1] += 1
 
 
     def mcts_helper(self, position, duration, tree):
