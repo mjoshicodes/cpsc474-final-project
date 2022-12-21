@@ -121,26 +121,26 @@ class MCTS():
         self.backpropogate(path, payoff, tree)
 
 
-    def simulate(self, node):
+    def simulate(self, position):
         """
-            Randomly explores children nodes of the current node until we 
+            Randomly explores possible future positions of the current position until we 
             hit a terminal state, then return the terminal position's payoff.
 
-            node -- The current node, which corresponds to a current game position.
+            position -- The current node, which corresponds to a current game position.
         """
-        while not node.is_game_over():
-            actions = node.get_actions()
-            node = node.simulate_action(choice(actions))
-        return node.payoff()
+        while not position.is_game_over():
+            actions = position.get_actions()
+            position = position.simulate_action(choice(actions))
+        return position.payoff()
 
 
     def backpropogate(self, path, payoff, tree):
         """
-            Goes through each node in the just-searched path of the tree, 
+            Goes through each position in the just-searched path of the tree, 
             updating it with payoff as well as incrementing its number of visits.
 
-            path -- A list of nodes that was just searched within the tree.\n
-            payoff -- The reward each node will get for searching\n
+            path -- A list of positions that was just searched within the tree.\n
+            payoff -- The reward each position will get for searching\n
             tree -- The chopsticks tree being searched.
         """
         for position in path:
