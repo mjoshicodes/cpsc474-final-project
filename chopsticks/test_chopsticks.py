@@ -7,7 +7,8 @@ import chopsticks_strategy as chopsticks_QL
 import chopsticks_qfl
 
 from policy import CompositePolicy, RandomSplitter, RandomAttacker, RandomDivider, GreedyAttacker, GreedySplitter, GreedyDivider, RulesAttacker, RulesSplitter, RulesDivider
-from chopsticks import Game, evaluate_policies
+from mcts import MCTS
+from chopsticks import Game, evaluate_policies, evaluate_mcts_policies
 
 if __name__ == "__main__":
     games = 2
@@ -61,13 +62,30 @@ if __name__ == "__main__":
 
     #################################################################################
     # MCTS VS GREEDY AGENT HERE
+    game = Game()
+    benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
+    submission = MCTS(0.05).mcts_function
+
+    results = evaluate_mcts_policies(game, lambda: submission, benchmark, 1000)
+    print(f"Playing chopsticks with 1000 games")
+    print(f"P1: MCTS Agent won {results[0]} percent of games")
+    print(f"P2: Greedy Agent won {results[1]} percent of games")
+    print()
     #################################################################################
 
 
     #################################################################################
-    # Q-LEARN VS GREEDY AGENT HERE
-    #################################################################################
+    # MCTS VS RANDOM AGENT HERE
+    game = Game()
+    benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
+    submission = MCTS(0.05).mcts_function
 
+    results = evaluate_mcts_policies(game, lambda: submission, benchmark, 1000)
+    print(f"Playing chopsticks with 1000 games")
+    print(f"P1: MCTS Agent won {results[0]} percent of games")
+    print(f"P2: Random Agent won {results[1]} percent of games")
+    print()
+    #################################################################################
 
 
     limit = 9
