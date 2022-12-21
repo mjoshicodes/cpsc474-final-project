@@ -152,6 +152,7 @@ class Game:
             if next_position._turn == P1:
                 next_position.p1.update_left_hand(new_left_hand_value)
                 next_position.p1.update_right_hand(new_right_hand_value)
+                next_position.next_turn()
             else:
                 next_position.p2.update_left_hand(new_left_hand_value)
                 next_position.p2.update_right_hand(new_right_hand_value)
@@ -243,8 +244,6 @@ class Game:
                 action = max(actions, key=lambda x: x[3])
                 self.execute_action(self.p2, self.p1, action)
 
-            # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
-
             self.next_turn()
 
         if self.p1.lost():
@@ -271,8 +270,6 @@ class Game:
                 random.shuffle(actions)
                 action = max(actions, key=lambda x: x[3])
                 self.execute_action(self.p2, self.p1, action)
-
-            # print(self.p1.left_hand(), self.p1.right_hand(), self.p2.left_hand(), self.p2.right_hand())
 
             self.next_turn()
 
