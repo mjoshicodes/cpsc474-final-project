@@ -11,37 +11,31 @@ from mcts import MCTS
 from chopsticks import Game, evaluate_policies, evaluate_mcts_policies
 
 if __name__ == "__main__":
-    games = 2
-    if len(sys.argv) > 1:
-        games = int(sys.argv[1])
-
-
     #################################################################################
     # GREEDY VS RANDOM AGENT HERE
     game = Game()
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
 
+    games = 100000
     results = evaluate_policies(game, benchmark, submission, games)
-    print(f"Playing chopsticks with {games} games")
-    print(f"P1: Random Agent won {results[0]} percent of games")
-    print(f"P2: Greedy Agent won {results[1]} percent of games")
+    print("TEST 1: Greedy against a Random Agent")
+    print(f"We are using a Greedy agent to play Chopsticks against a Random agent. Here's our winning ratio over {games} games: {results[1]}")
     print()
     #################################################################################
 
 
     #################################################################################
-    # RANDOM VS RULE BASED HERE
+    # RULES BASED VS RANDOM HERE
     game = Game()
-    # benchmark = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
 
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
 
+    games = 100000
     results = evaluate_policies(game, benchmark, submission, games)
-    print(f"Playing chopsticks with {games} games")
-    print(f"P1: Random Agent won {results[0]} percent of games")
-    print(f"P2: Rules Based Agent won {results[1]} percent of games")
+    print("TEST 2: Rules-based against a Random Agent")
+    print(f"We are using a Rules-based agent to play Chopsticks against a Random agent. Here's our winning ratio over {games} games: {results[1]}")
     print()
     #################################################################################
 
@@ -52,10 +46,10 @@ if __name__ == "__main__":
     benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game),GreedyDivider(game))
     submission = CompositePolicy(game, RulesSplitter(game), RulesAttacker(game), RulesDivider(game))
 
+    games = 100000
     results = evaluate_policies(game, benchmark, submission, games)
-    print(f"Playing chopsticks with {games} games")
-    print(f"P1: Greedy Agent won {results[0]} percent of games")
-    print(f"P2: Rules Based Agent won {results[1]} percent of games")
+    print("TEST 3: Rules-based against a Greedy Agent")
+    print(f"We are using a Rules-based agent to play Chopsticks against a Greedy agent. Here's our winning ratio over {games} games: {results[1]}")
     print()
     #################################################################################
 
@@ -65,11 +59,11 @@ if __name__ == "__main__":
     game = Game()
     benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
     submission = MCTS(0.05).mcts_function
+    games = 100
 
-    results = evaluate_mcts_policies(game, lambda: submission, benchmark, 1000)
-    print(f"Playing chopsticks with 1000 games")
-    print(f"P1: MCTS Agent won {results[0]} percent of games")
-    print(f"P2: Greedy Agent won {results[1]} percent of games")
+    results = evaluate_mcts_policies(game, lambda: submission, benchmark, games)
+    print("TEST 4: MCTS against a Greedy Agent")
+    print(f"We are using an MCTS agent to play Chopsticks against a Greedy agent. Here's our winning ratio over {games} games: {results[0]}")
     print()
     #################################################################################
 
@@ -80,14 +74,30 @@ if __name__ == "__main__":
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = MCTS(0.05).mcts_function
 
-    results = evaluate_mcts_policies(game, lambda: submission, benchmark, 1000)
-    print(f"Playing chopsticks with 1000 games")
-    print(f"P1: MCTS Agent won {results[0]} percent of games")
-    print(f"P2: Random Agent won {results[1]} percent of games")
+    games = 100
+    results = evaluate_mcts_policies(game, lambda: submission, benchmark, games)
+    print("TEST 5: MCTS against a Random Agent")
+    print(f"We are using an MCTS agent to play Chopsticks against a Random agent. Here's our winning ratio over {games} games: {results[0]}")
     print()
     #################################################################################
 
 
+    limit = 9
+    games = 250000
+    model = chopsticks_QL.ChopsticksStrategy()
+    start = time.time()
+    policy = chopsticks_qfl.q_learn(model, limit)
+    t = time.time() - start
+
+    result = model.simulate(policy, games)
+    print("TEST 6: Q-Learning against a Random Agent")
+    print(f"We are using Q-learning to play Chopsticks against a Random Strategy. Here is my winning percentage over {games} games: {result}")
+    print()
+    #################################################################################
+
+
+    #################################################################################
+    # Q-LEARNING VS. GREEDY AGENT
     limit = 9
     n = 250000
     model = chopsticks_QL.ChopsticksStrategy()
@@ -95,22 +105,13 @@ if __name__ == "__main__":
     policy = chopsticks_qfl.q_learn(model, limit)
     t = time.time() - start
 
-    #################################################################################
-    #   Q-LEARNING VS. RANDOM AGENT
-    #################################################################################
-
-    print ("TEST 1: Q-Learning against a Random Agent")
-    
-    print("We are using Q-learning to play Chopsticks against a Random Strategy. Here is my winning percentage over", n, "games:", model.simulate(policy, n))
-
-    #################################################################################
-    #   Q-LEARNING VS. GREEDY AGENT
-    #################################################################################
-
-    print ("TEST 2: Q-Learning against a Greedy Agent")
 
     test_limit = 10
     t = time.time()
     while t < test_limit:
         val, n = model.simulate_greedy(policy, n)
-    print("Running against a greedy strategy, which our optimal solution, and therefore will run indefintely")
+
+    print("TEST 7: Q-Learning against a Greedy Agent")
+    print("Q-learning running against a greedy strategy, which is an optimal solution, will therefore run indefintely")
+    print()
+    #################################################################################
