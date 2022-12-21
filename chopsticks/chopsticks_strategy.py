@@ -1,5 +1,5 @@
 import random
-from chopsticks import Game
+from chopsticks_ql import Game
 import greedy_ql
 
 class ChopsticksStrategy:
