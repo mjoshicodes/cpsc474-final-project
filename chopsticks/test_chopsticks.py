@@ -62,7 +62,7 @@ if __name__ == "__main__":
     game = Game()
     benchmark = CompositePolicy(game, GreedySplitter(game), GreedyAttacker(game), GreedyDivider(game))
     submission = MCTS(0.05).mcts_function
-    games = 500
+    games = 1000
 
     results = evaluate_mcts_policies(game, lambda: submission, benchmark, games)
     print("TEST 4: MCTS against a Greedy Agent")
@@ -77,7 +77,7 @@ if __name__ == "__main__":
     benchmark = CompositePolicy(game, RandomSplitter(game), RandomAttacker(game), RandomDivider(game))
     submission = MCTS(0.05).mcts_function
 
-    games = 500
+    games = 1000
     results = evaluate_mcts_policies(game, lambda: submission, benchmark, games)
     print("TEST 5: MCTS against a Random Agent")
     print(f"We are using an MCTS agent to play Chopsticks against a Random agent. Here's our winning ratio over {games} games: {results[0]}")
